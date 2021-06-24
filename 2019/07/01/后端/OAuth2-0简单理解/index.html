@@ -1,0 +1,379 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="OAuth2.0" />
+
+
+<meta name="description" content="[TOC]
+一、定义一个关于授权的开放网络标准。
+允许用户让第三方应用访问该用户在某一网站上存储的私密的资源，而无须将用户名和密码提供给第三方应用
+二、授权方式四种授权方式：
+
+授权码（auth..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    OAuth2.0简单理解 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="OAuth2.0简单理解">
+            
+            OAuth2.0简单理解
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E5%90%8E%E7%AB%AF/">后端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/OAuth2-0/" rel="tag">OAuth2.0</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2019/07/01</span>
+    </span>
+    
+    
+</div>
+        
+        
+        <p class="fa fa-exclamation-triangle warning">
+            本文于<strong>
+                724</strong>
+            天之前发表，文中内容可能已经过时。
+        </p>
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>[TOC]</p>
+<h4 id="一、定义"><a href="#一、定义" class="headerlink" title="一、定义"></a>一、定义</h4><p>一个关于授权的开放网络标准。</p>
+<p>允许用户让第三方应用访问该用户在某一网站上存储的私密的资源，而无须将用户名和密码提供给第三方应用</p>
+<h4 id="二、授权方式"><a href="#二、授权方式" class="headerlink" title="二、授权方式"></a>二、授权方式</h4><p>四种授权方式：</p>
+<ul>
+<li>授权码（authorization-code）</li>
+<li>隐藏式（implicit）</li>
+<li>密码式（password）</li>
+<li>客户端凭证（client credentials）</li>
+</ul>
+<h5 id="1-授权码"><a href="#1-授权码" class="headerlink" title="1.授权码"></a>1.授权码</h5><p><strong>第三方应用先申请和一个授权码，然后再用该码获取令牌</strong></p>
+<p>最常用流程，安全性也高。<code>授权码</code>通过<code>前端</code>传送，<code>令牌</code>则是存储在<code>后端</code>，而且所有与资源服务器的通信都在后端完成。这样前后端分离，可以避免<code>令牌</code>泄露</p>
+<p>（类似于微信登录）</p>
+<ol>
+<li>A跳转B，请求授权码。</li>
+<li>B提示登录授权，授权后回跳到A，返回授权码</li>
+<li>A拿到授权码，向B的后端请求令牌</li>
+<li>A拿到令牌，正常访问B的资源</li>
+</ol>
+<h5 id="2-隐藏式"><a href="#2-隐藏式" class="headerlink" title="2.隐藏式"></a>2.隐藏式</h5><p><strong>允许直接向前端办法令牌，这中方式没有授权码这个中间步骤</strong></p>
+<ol>
+<li>A跳转B，请求令牌</li>
+<li>A拿到令牌，正常访问B的资源</li>
+</ol>
+<h5 id="3-密码式"><a href="#3-密码式" class="headerlink" title="3.密码式"></a>3.密码式</h5><p><strong>允许用户把用户名和密码，直接告诉该应用。该应用就使用你的密码，申请令牌</strong></p>
+<ol>
+<li>A带上B的用户名和密码访问，返回令牌</li>
+<li>A拿到令牌，正常访问B的资源</li>
+</ol>
+<blockquote>
+<p>风险很大，除特殊情况一般不考虑吧使用，必须是用户高度信任的用户</p>
+</blockquote>
+<h5 id="4-凭证式"><a href="#4-凭证式" class="headerlink" title="4.凭证式"></a>4.凭证式</h5><p><strong>没有前端的命令行应用，在命令下请求令牌</strong></p>
+<ol>
+<li>A在命令行请求B（client_id、client_secret）</li>
+<li>B验证通过，直接返回令牌，A正常请求B的资源</li>
+</ol>
+<blockquote>
+<p>此方式不是针对用户的，二十针对第三方应用的，所以存在多用户共享同一令牌</p>
+</blockquote>
+<h4 id="三、更新令牌"><a href="#三、更新令牌" class="headerlink" title="三、更新令牌"></a>三、更新令牌</h4><p>一次性颁发两个令牌，一个用于获取数据，另一个用于获取新的令牌。令牌到期前，用户使用refresh token发送一个请求，去更新令牌</p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2019/07/01/%E5%90%8E%E7%AB%AF/mysql%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/" class="pre-post btn btn-default" title='mysql必知必会'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            mysql必知必会</span>
+    </a>
+    
+    
+    <a href="/2019/05/29/%E5%89%8D%E7%AB%AF/flask%E9%A1%B9%E7%9B%AE%E4%BD%BF%E7%94%A8/" class="next-post btn btn-default" title='flask项目使用'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            flask项目使用</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%AE%9A%E4%B9%89"><span class="toc-text">一、定义</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%8E%88%E6%9D%83%E6%96%B9%E5%BC%8F"><span class="toc-text">二、授权方式</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E6%8E%88%E6%9D%83%E7%A0%81"><span class="toc-text">1.授权码</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E9%9A%90%E8%97%8F%E5%BC%8F"><span class="toc-text">2.隐藏式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E5%AF%86%E7%A0%81%E5%BC%8F"><span class="toc-text">3.密码式</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E5%87%AD%E8%AF%81%E5%BC%8F"><span class="toc-text">4.凭证式</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%9B%B4%E6%96%B0%E4%BB%A4%E7%89%8C"><span class="toc-text">三、更新令牌</span></a></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

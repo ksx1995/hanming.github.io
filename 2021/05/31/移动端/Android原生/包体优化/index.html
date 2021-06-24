@@ -1,0 +1,433 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="Android" />
+
+
+<meta name="description" content="[TOC]
+优化好处
+包体积减小，易于升级
+多市场渠道有体积限制，避免二次处理
+apk安装时间减小
+运行时内存占用小
+磁盘空间占用小，odex二进制文件小。
+
+APK组成及分析APK组成
+ass..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    包体优化 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="包体优化">
+            
+            包体优化
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/Android/" rel="tag">Android</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/05/31</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>[TOC]</p>
+<h3 id="优化好处"><a href="#优化好处" class="headerlink" title="优化好处"></a>优化好处</h3><ol>
+<li>包体积减小，易于升级</li>
+<li>多市场渠道有体积限制，避免二次处理</li>
+<li>apk安装时间减小</li>
+<li>运行时内存占用小</li>
+<li>磁盘空间占用小，odex二进制文件小。</li>
+</ol>
+<h3 id="APK组成及分析"><a href="#APK组成及分析" class="headerlink" title="APK组成及分析"></a>APK组成及分析</h3><h4 id="APK组成"><a href="#APK组成" class="headerlink" title="APK组成"></a>APK组成</h4><ul>
+<li>assets: 开发目录下assets目录</li>
+<li>lib：所需要的so库</li>
+<li>META-INF：签名文件</li>
+<li>okhttp3：okhttp网络相关</li>
+<li>org：org相关信息</li>
+<li>res：布局信息，对应开发目录res下</li>
+<li>AndroidManifest：四大组件配置</li>
+<li>classes.dex：代码压缩文件</li>
+</ul>
+<h4 id="apk分析"><a href="#apk分析" class="headerlink" title="apk分析"></a>apk分析</h4><ol>
+<li>使用常规apktool方法</li>
+<li><p>使用jadx工具</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/skylot/jadx">https://github.com/skylot/jadx</a></p>
+<p>直接将apk拖入程序即可查看各种信息</p>
+</li>
+<li>Android Studio中的Analyze apk可以分析apk的组成</li>
+</ol>
+<h3 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h3><h4 id="代码优化"><a href="#代码优化" class="headerlink" title="代码优化"></a>代码优化</h4><p>代码全部存储在dex文件中，所以我们需要先搞懂什么是dex？</p>
+<h5 id="dex理解"><a href="#dex理解" class="headerlink" title="dex理解"></a>dex理解</h5><p><strong>dex文件是专为Dalvik设计的一种压缩格式</strong></p>
+<blockquote>
+<p>.java–&gt;.class–&gt;.dex</p>
+</blockquote>
+<p>在.java–&gt;.class过程中，主要是jvm的操作，在.class–&gt;.dex过程中，需要将.class文件转化为Dalvik识别的.dex文件</p>
+<p>dex主要结构如下：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/11/19/16729fad9d5f4ab1" alt="image"></p>
+<blockquote>
+<p>同jar相比，dex文件的大小能够缩减50%左右</p>
+</blockquote>
+<h5 id="ProGuard代码混淆"><a href="#ProGuard代码混淆" class="headerlink" title="ProGuard代码混淆"></a>ProGuard代码混淆</h5><p>在build.gradle中开启混淆，将类名转化为没有意义的a,b,c等，提高阅读难度，其次通过缩短名称可以有效缩减dex大小，而且会移除在代码中没有使用的代码。</p>
+<h5 id="D8与R8的优化"><a href="#D8与R8的优化" class="headerlink" title="D8与R8的优化"></a>D8与R8的优化</h5><ul>
+<li>D8：把java字节码转化为dex代码，简单来说就是dex编译器</li>
+<li>R8：混淆压缩与优化部分的替代品，但是不能完全替代proguard</li>
+</ul>
+<p>D8的提出是用来取代DX的，他的优化如下：</p>
+<ul>
+<li>编译时间缩短</li>
+<li>.dex文件更小</li>
+<li>.dex运行性能更好</li>
+<li>包含java8语言支持</li>
+</ul>
+<p>R8与proguard非常相似，但不能完全替代proguard</p>
+<ul>
+<li>ProGuard 在将枚举类型简化为原始整数方面会更加强大</li>
+<li>ProGuard 中应用的模式匹配算法可以识别和替换短指令序列，从而提高代码效率并为更多优化打开了机会。在优化遍历的顺序中，尤其是数学运算和字符串运算可从中受益</li>
+<li>ProGuard 具有独特的能力来优化使用 GSON 库将对象序列化或反序列化为 JSON 的代码</li>
+</ul>
+<h5 id="Dex分包优化"><a href="#Dex分包优化" class="headerlink" title="Dex分包优化"></a>Dex分包优化</h5><p>当apk方法数超过65536时，必须采用分包策略，这样跨dex调用会出现一些重复信息：</p>
+<ul>
+<li>多余的 method id：跨 Dex 调用会导致当前dex保留被调用dex中的方法id，这种冗余会导致每一个dex中可以存放的class变少，最终又会导致编译出来的dex数量增多，而dex数据的增加又会进一步加重这个问题。</li>
+<li>其它跨dex调用造成的信息冗余：除了需要多记录被调用的method id之外，还需多记录其所属类和当前方法的定义信息，这会造成 string_ids、type_ids、proto_ids 这几部分信息的冗余。</li>
+</ul>
+<p>所以使用ReDex进行分包优化，同时，去除dex文件中的debug信息及行号信息</p>
+<h4 id="svg的使用"><a href="#svg的使用" class="headerlink" title="svg的使用"></a>svg的使用</h4><h4 id="使用指定语言，删除不必要的语言"><a href="#使用指定语言，删除不必要的语言" class="headerlink" title="使用指定语言，删除不必要的语言"></a>使用指定语言，删除不必要的语言</h4><h5 id="使用XZ-Utils进行Dex压缩"><a href="#使用XZ-Utils进行Dex压缩" class="headerlink" title="使用XZ Utils进行Dex压缩"></a>使用XZ Utils进行Dex压缩</h5><p><a target="_blank" rel="noopener" href="https://tukaani.org/xz/">https://tukaani.org/xz/</a><br>将dex压缩后放在assets目录中，减少包体积，但是会提高安装时间</p>
+<h5 id="三方库优化"><a href="#三方库优化" class="headerlink" title="三方库优化"></a>三方库优化</h5><p>在使用三方库中，小库可以完成目前业务就是用小库，减小三方库的大小，比如Picasso、Glide、Fresco的大小和功能</p>
+<h5 id="Lint"><a href="#Lint" class="headerlink" title="Lint"></a>Lint</h5><p>使用Lint优化代码，移除没有使用的代码</p>
+<h5 id="减少enum的使用"><a href="#减少enum的使用" class="headerlink" title="减少enum的使用"></a>减少enum的使用</h5><p><a target="_blank" rel="noopener" href="https://www.liaohuqiu.net/cn/posts/android-enum-memory-usage/">Android 中的 Enum 到底占多少内存？该如何用？</a></p>
+<h4 id="资源优化"><a href="#资源优化" class="headerlink" title="资源优化"></a>资源优化</h4><ul>
+<li>Lint：使用lint去除冗余资源</li>
+<li>shrinkResources：去除无用资源</li>
+<li>重复资源优化：多模块使用同一个资源文件，去除重复资源文件，保留第一份资源</li>
+<li>图片压缩：AAPT优化图片，选择webp格式的图片</li>
+<li>使用针对性图片格式<ol>
+<li>聊天表情出一套图 =&gt; hdpi。</li>
+<li>纯色小 icon 使用 VD =&gt; raw。</li>
+<li>背景大图出一套 =&gt; xhdpi。</li>
+<li>logo 等权重比较大的图片出两套 =&gt; hdpi，xhdpi。</li>
+<li>若某些图在真机中有异常，则用多套图。</li>
+<li>若遇到奇葩机型，则针对性补图。</li>
+</ol>
+</li>
+<li>资源路径混淆成单个资源的路径：使用AndroidResGuard，缩短资源路径</li>
+<li>将资源文件放置在服务器上，通过网络加载</li>
+</ul>
+<h4 id="so库优化"><a href="#so库优化" class="headerlink" title="so库优化"></a>so库优化</h4><ul>
+<li>通过abiFilters过滤so库</li>
+<li>对于敏感的so库，不同架构全部放置在armeabi中，在程序中判断系统架构，加载不同的so库</li>
+<li>Native Library压缩：XZ Utils，SoLoader</li>
+<li>so库动态下载：<a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/X58fK02imnNkvUMFt23OAg">https://mp.weixin.qq.com/s/X58fK02imnNkvUMFt23OAg</a></li>
+</ul>
+<h4 id="其他优化"><a href="#其他优化" class="headerlink" title="其他优化"></a>其他优化</h4><ol>
+<li><p>插件化</p>
+<p>插件可以热插拔，从服务器下载</p>
+</li>
+<li><p>转变开发模式</p>
+<p>使用混合式开发</p>
+</li>
+<li>梳理业务，简化逻辑和业务</li>
+</ol>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E5%86%85%E5%AD%98%E4%BC%98%E5%8C%96/" class="pre-post btn btn-default" title='内存优化'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            内存优化</span>
+    </a>
+    
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E5%B8%83%E5%B1%80%E4%BC%98%E5%8C%96/" class="next-post btn btn-default" title='布局优化'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            布局优化</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%A5%BD%E5%A4%84"><span class="toc-text">优化好处</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#APK%E7%BB%84%E6%88%90%E5%8F%8A%E5%88%86%E6%9E%90"><span class="toc-text">APK组成及分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#APK%E7%BB%84%E6%88%90"><span class="toc-text">APK组成</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#apk%E5%88%86%E6%9E%90"><span class="toc-text">apk分析</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-text">优化方案</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%A3%E7%A0%81%E4%BC%98%E5%8C%96"><span class="toc-text">代码优化</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#dex%E7%90%86%E8%A7%A3"><span class="toc-text">dex理解</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#ProGuard%E4%BB%A3%E7%A0%81%E6%B7%B7%E6%B7%86"><span class="toc-text">ProGuard代码混淆</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#D8%E4%B8%8ER8%E7%9A%84%E4%BC%98%E5%8C%96"><span class="toc-text">D8与R8的优化</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Dex%E5%88%86%E5%8C%85%E4%BC%98%E5%8C%96"><span class="toc-text">Dex分包优化</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#svg%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">svg的使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8%E6%8C%87%E5%AE%9A%E8%AF%AD%E8%A8%80%EF%BC%8C%E5%88%A0%E9%99%A4%E4%B8%8D%E5%BF%85%E8%A6%81%E7%9A%84%E8%AF%AD%E8%A8%80"><span class="toc-text">使用指定语言，删除不必要的语言</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8XZ-Utils%E8%BF%9B%E8%A1%8CDex%E5%8E%8B%E7%BC%A9"><span class="toc-text">使用XZ Utils进行Dex压缩</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E4%B8%89%E6%96%B9%E5%BA%93%E4%BC%98%E5%8C%96"><span class="toc-text">三方库优化</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#Lint"><span class="toc-text">Lint</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%87%8F%E5%B0%91enum%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-text">减少enum的使用</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B5%84%E6%BA%90%E4%BC%98%E5%8C%96"><span class="toc-text">资源优化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#so%E5%BA%93%E4%BC%98%E5%8C%96"><span class="toc-text">so库优化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E4%BC%98%E5%8C%96"><span class="toc-text">其他优化</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

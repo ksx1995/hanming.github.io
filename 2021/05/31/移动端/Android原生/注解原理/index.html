@@ -1,0 +1,380 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="Android" />
+
+
+<meta name="description" content="[TOC]
+注解简析元注解：修饰注解的注解，
+
+@Target：注解的作用目标（修饰方法，类还是字段）
+@Retention：注解的生命周期
+SOURCE：仅存在java源文件中，经过编译器后就..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    注解原理 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="注解原理">
+            
+            注解原理
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/Android/" rel="tag">Android</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/05/31</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>[TOC]</p>
+<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><h3 id="简析"><a href="#简析" class="headerlink" title="简析"></a>简析</h3><p>元注解：修饰注解的注解，</p>
+<ul>
+<li>@Target：注解的作用目标（修饰方法，类还是字段）</li>
+<li>@Retention：注解的生命周期<ul>
+<li>SOURCE：仅存在java源文件中，经过编译器后就丢弃，适用于一些检查行的操作，比如@Override</li>
+<li>CLASS：编译class文件时生效，适用于在编译时女性一些预处理操作，比如Butterknife的@BindView，在编译时，通过注解器生成一些辅助代码，完成完整的功能</li>
+<li>RUNTIME：保留在运行时VM中可以通过反射获取注解。适用于一些需要运行时动态获取注解信息，类似反射获取注解等，比如EventBus的@Subscribe</li>
+</ul>
+</li>
+<li>@Documented：注解是否应当被包含在JavaDoc文档中</li>
+<li>@Inherited：是否允许子类继承该注解</li>
+<li>AnnotationInvocationHandler：专门处理注解的Handler</li>
+</ul>
+<p>代码的生命周期包含：编码(SOURCE)—-&gt;编译(CLASS)—-&gt;运行(RUNTIME)</p>
+<blockquote>
+<p>默认时注解在编译阶段，即CLASS阶段</p>
+</blockquote>
+<p>本质：一个继承了Annotation接口的接口</p>
+<ul>
+<li>运行时处理：使用反射获取当前的所需要的东西</li>
+<li>编译时处理：APT技术，即编译期扫描java文件的注解，并传递到注解处理器，注解处理器可根据注解生成新的java文件</li>
+</ul>
+<h3 id="注解器"><a href="#注解器" class="headerlink" title="注解器"></a>注解器</h3><p>注解器通常是以Java代码（或者编译过的字节码）作为输入，生成.java文件作为输出</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/10/29/166bf16b90b04e6c" alt="image"></p>
+<p>使用google的AutoService（@AutoService）可以自动生成resources/META-INF.services中的注册目录</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/10/29/166bf16ca4f2434d" alt="image"></p>
+<p>包含注解处理器，注解声明库，实际使用APT的Android/Java项目</p>
+<h4 id="为什么把注解处理器独立抽成一个库呢？"><a href="#为什么把注解处理器独立抽成一个库呢？" class="headerlink" title="为什么把注解处理器独立抽成一个库呢？"></a>为什么把注解处理器独立抽成一个库呢？</h4><p>对于Android项目默认是不包含 APT相关类的。所以要使用APT技术，那么就必须创建一个Java Library。对于Java项目，独立抽成一个库，更容易维护与扩展。</p>
+<h4 id="为什么把注解声明也单独抽成一个库，而不放到注解处理工具库中呢？"><a href="#为什么把注解声明也单独抽成一个库，而不放到注解处理工具库中呢？" class="headerlink" title="为什么把注解声明也单独抽成一个库，而不放到注解处理工具库中呢？"></a>为什么把注解声明也单独抽成一个库，而不放到注解处理工具库中呢？</h4><p>这样可以不用将注解处理器的相关代码大报道使用者的项目中去</p>
+<h4 id="注解器声明"><a href="#注解器声明" class="headerlink" title="注解器声明"></a>注解器声明</h4><p>其方法包含四个主要重写方法</p>
+<ul>
+<li>init() ：初始化调用</li>
+<li>process()：实际处理方法</li>
+<li>getSupportedAnnotationTypes()：返回当前注解器处理注解的类型</li>
+<li>getSupportedSourceVersion()：指定你使用的java版本</li>
+</ul>
+<p>在注解处理过程中，会扫描所有的java源文件，查询注解，在java源代码中，每一部分都代表一个特定类型的Element，比如：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.jennifer.andy.aptdemo.domain;<span class="comment">//PackageElement</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;<span class="comment">//TypeElement </span></span><br><span class="line">    <span class="keyword">private</span> String where;<span class="comment">//VariableElement</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span> </span>&#123; &#125;<span class="comment">//ExecutableElement</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;<span class="comment">//ExecutableElement</span></span><br><span class="line">        <span class="keyword">int</span> runTime;<span class="comment">//VariableElement</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>注解处理器是运行在它自己的虚拟机JVM中，javac启动一个完整Java虚拟机来运行注解处理器。</p>
+</blockquote>
+<p>最终是通过自定义注解器在编译时期生成加载注解后的类，在process方法中具体做了执行，编译了程序模版信息进行添加。</p>
+<h3 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h3><p>如果是单一属性，可以使用value字段</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@interface</span> MyAnno1 &#123;</span><br><span class="line">    <span class="comment">//格式：类型名 属性名（）</span></span><br><span class="line">    <span class="function">String <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@MyAnno1(&quot;kang&quot;)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@interface</span> MyAnno2 &#123;</span><br><span class="line">    <span class="comment">//格式：类型名 属性名（）</span></span><br><span class="line">    <span class="function">String <span class="title">name</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@MyAnno2(name = &quot;kang&quot;)</span></span><br></pre></td></tr></table></figure>
+<p>如果不是value字段的话，需要（指定属性 = 值）</p>
+<blockquote>
+<p>注解中只允许八中基本数据类型、字符串、类类型，注解类型，枚举类型及其一维数组</p>
+</blockquote>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E5%90%AF%E5%8A%A8%E4%BC%98%E5%8C%96/" class="pre-post btn btn-default" title='启动优化'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            启动优化</span>
+    </a>
+    
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/LiveData%E5%92%8CViewModel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="next-post btn btn-default" title='LiveData和ViewModel源码分析'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            LiveData和ViewModel源码分析</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3"><span class="toc-text">注解</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E6%9E%90"><span class="toc-text">简析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E5%99%A8"><span class="toc-text">注解器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8A%8A%E6%B3%A8%E8%A7%A3%E5%A4%84%E7%90%86%E5%99%A8%E7%8B%AC%E7%AB%8B%E6%8A%BD%E6%88%90%E4%B8%80%E4%B8%AA%E5%BA%93%E5%91%A2%EF%BC%9F"><span class="toc-text">为什么把注解处理器独立抽成一个库呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%8A%8A%E6%B3%A8%E8%A7%A3%E5%A3%B0%E6%98%8E%E4%B9%9F%E5%8D%95%E7%8B%AC%E6%8A%BD%E6%88%90%E4%B8%80%E4%B8%AA%E5%BA%93%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%94%BE%E5%88%B0%E6%B3%A8%E8%A7%A3%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7%E5%BA%93%E4%B8%AD%E5%91%A2%EF%BC%9F"><span class="toc-text">为什么把注解声明也单独抽成一个库，而不放到注解处理工具库中呢？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E5%99%A8%E5%A3%B0%E6%98%8E"><span class="toc-text">注解器声明</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3"><span class="toc-text">自定义注解</span></a></li></ol></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

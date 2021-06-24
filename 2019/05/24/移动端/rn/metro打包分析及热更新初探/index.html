@@ -1,0 +1,410 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="react native" />
+
+
+<meta name="description" content="
+定义：打包工具
+
+react-native在0.5版本以后引入metro-bundler工具打包
+在对每个模块进行捆绑时，每个模块都会分配一个固定的id，意味着不能动态更新（导入组件的顺序发生..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    metro打包分析及热更新初探 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="metro打包分析及热更新初探">
+            
+            metro打包分析及热更新初探
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/react-native/" rel="tag">react native</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2019/05/24</span>
+    </span>
+    
+    
+</div>
+        
+        
+        <p class="fa fa-exclamation-triangle warning">
+            本文于<strong>
+                762</strong>
+            天之前发表，文中内容可能已经过时。
+        </p>
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <blockquote>
+<p>定义：打包工具</p>
+</blockquote>
+<p>react-native在0.5版本以后引入metro-bundler工具打包</p>
+<p>在对每个模块进行捆绑时，每个模块都会分配一个固定的id，意味着不能动态更新（导入组件的顺序发生变化，或者依赖版本做了更新），将id转化为module的路径</p>
+<p><img src="/img/metro.png" alt="打包流程"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">选项</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">entry-file</td>
+<td style="text-align:left">根JS文件的绝对路径</td>
+</tr>
+<tr>
+<td style="text-align:center">output</td>
+<td style="text-align:left">文件名存储输出的位置，例如 /tmp/dependencies.txt</td>
+</tr>
+<tr>
+<td style="text-align:center">platform</td>
+<td style="text-align:left">用于选择模块的平台扩展</td>
+</tr>
+<tr>
+<td style="text-align:center">transformer</td>
+<td style="text-align:left">指定要使用的自定义转换器</td>
+</tr>
+<tr>
+<td style="text-align:center">max-workers</td>
+<td style="text-align:left">指定工作池将为转换文件生成的最大工作器数。默认为计算机上可用的核心数。</td>
+</tr>
+<tr>
+<td style="text-align:center">dev</td>
+<td style="text-align:left">如果为false，则跳过所有dev-only代码路径</td>
+</tr>
+<tr>
+<td style="text-align:center">verbose</td>
+<td style="text-align:left">启用日志记录</td>
+</tr>
+</tbody>
+</table>
+<h3 id="高速缓存"><a href="#高速缓存" class="headerlink" title="高速缓存"></a>高速缓存</h3><p>Metro具有多层缓存：您可以设置多个缓存供Metro使用而不是一个。这有几个优点，在这个页面上我们将解释缓存如何工作。</p>
+<h3 id="添加global-DEV变量区分打包的执行环境"><a href="#添加global-DEV变量区分打包的执行环境" class="headerlink" title="添加global.DEV变量区分打包的执行环境"></a>添加global.<strong>DEV</strong>变量区分打包的执行环境</h3><p>(release) __DEV__ = false</p>
+<p>bundle中使用Number(int)数值型以_d的方式定义了代码模块ID，并使用_r的方式进行依赖行。如果存在模块间的改变或者修改，都有可能导致模块ID发生改变，导致旧的bundle文件不能使用。所以在拆分公共部分与业务部分的过程中，需要我们解决模块间依赖的问题。</p>
+<h1 id="热更新"><a href="#热更新" class="headerlink" title="热更新"></a>热更新</h1><h2 id="拆包-gt-gt-gt-gt-gt-comm打diff包-gt-gt-gt-gt-gt-gt-整合包"><a href="#拆包-gt-gt-gt-gt-gt-comm打diff包-gt-gt-gt-gt-gt-gt-整合包" class="headerlink" title="拆包&gt;&gt;&gt;&gt;&gt;comm打diff包&gt;&gt;&gt;&gt;&gt;&gt;整合包"></a>拆包&gt;&gt;&gt;&gt;&gt;comm打diff包&gt;&gt;&gt;&gt;&gt;&gt;整合包</h2><blockquote>
+<p>-d：define  (简单理解为模块)包括RN框架源码 js 部分、自定义js代码部分、图片资源信息，供 require 引入使用<br/><br>-r：require  找到 __d 定义的代码块 并执行</p>
+</blockquote>
+<h3 id="拆包（基础包和业务包）"><a href="#拆包（基础包和业务包）" class="headerlink" title="拆包（基础包和业务包）"></a>拆包（基础包和业务包）</h3><p> 原先以moduleId作为参数传递，现在改为moduleName(module的路径)</p>
+<ol>
+<li>0.5 &lt;= version &lt; 0.52</li>
+<li>0.52 &lt;= version &lt;= 0.55</li>
+<li>0.56 &lt;= version</li>
+</ol>
+<h3 id="comm打出diff包"><a href="#comm打出diff包" class="headerlink" title="comm打出diff包"></a>comm打出diff包</h3><blockquote>
+<p>comm 可以用于两个文件之间的比较，它有一些选项可以用来调整输出，以便执行交集、求差、以及差集操作。</p>
+<ul>
+<li>交集：打印出两个文件所共有的行。</li>
+<li>求差：打印出指定文件所包含的且不相同的行。</li>
+<li>差集：打印出包含在一个文件中，但不包含在其他指定文件中的行。</li>
+</ul>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">-1：不显示在第一个文件出现的内容；</span><br><span class="line">-2：不显示在第二个文件中出现的内容；</span><br><span class="line">-3：不显示同时在两个文件中都出现的内容。</span><br></pre></td></tr></table></figure>
+<p>使用comm命令生成diff包</p>
+<h3 id="整合"><a href="#整合" class="headerlink" title="整合"></a>整合</h3><p>初始化RN环境时就加载基础包，后续添加模块功能时只需要添加模块功能的diff包即可，在任更新的应用是，在需要热更新时，下载最新diff包去替换原先diff包，重新启动后应用最新diff包即可</p>
+<ol>
+<li>包的合并</li>
+<li>diff包合并到diff包（重复的问题的处理）</li>
+</ol>
+<h3 id="为什么要使用路径代替moudleId进行引用"><a href="#为什么要使用路径代替moudleId进行引用" class="headerlink" title="为什么要使用路径代替moudleId进行引用"></a>为什么要使用路径代替moudleId进行引用</h3><p>metro-bundler 打包处理模块时，以递增的方式给每个模块一个 module ID，使得文件直接通过 require(module ID) 的方式引用其他模块；当然，一个项目的所有模块都在一个 bundle 中是没问题的，但进行 bundle 拆分后，当框架新增或删除一个依赖时，因为模块编号的方式使得在该状况下，后续的模块的 module ID 将会错位，这将造成升级框架 bundle 的难度，每次升级，其他业务 bundle 相应的需要回归测试，加大了开发测试成本。我们的选择是直接舍弃 module ID 的引用方式，直接使用模块路径进行引用，这样无论怎么增减模块，都不会出现模块引用错误的问题，做法也比较简单，重写了 resolutionResponse.getModuleId 方法，虽然会增大一点 bundle 的 size。</p>
+<p>问题： LoadBridge 和 ReactActivity的重写需要在com.facebook.react的报名下，否则会报错</p>
+<h3 id="结论：metro例子实现，无法使用google-diff合并diff包，所以metro完全是一个拆包方案，配合使用google-diff的热更新方案可以实现rn的热更新。"><a href="#结论：metro例子实现，无法使用google-diff合并diff包，所以metro完全是一个拆包方案，配合使用google-diff的热更新方案可以实现rn的热更新。" class="headerlink" title="结论：metro例子实现，无法使用google-diff合并diff包，所以metro完全是一个拆包方案，配合使用google-diff的热更新方案可以实现rn的热更新。"></a>结论：metro例子实现，无法使用google-diff合并diff包，所以metro完全是一个拆包方案，配合使用google-diff的热更新方案可以实现rn的热更新。</h3>
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2019/05/24/%E7%A7%BB%E5%8A%A8%E7%AB%AF/%E5%BE%AE%E4%BF%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91/" class="pre-post btn btn-default" title='微信小程序开发'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            微信小程序开发</span>
+    </a>
+    
+    
+    <a href="/2019/05/24/%E5%89%8D%E7%AB%AF/web%E7%AB%AF%E7%9A%84%E6%90%AD%E5%BB%BA%E5%92%8C%E9%83%A8%E7%BD%B2/" class="next-post btn btn-default" title='web端的搭建和部署'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            web端的搭建和部署</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E9%80%9F%E7%BC%93%E5%AD%98"><span class="toc-text">高速缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B7%BB%E5%8A%A0global-DEV%E5%8F%98%E9%87%8F%E5%8C%BA%E5%88%86%E6%89%93%E5%8C%85%E7%9A%84%E6%89%A7%E8%A1%8C%E7%8E%AF%E5%A2%83"><span class="toc-text">添加global.DEV变量区分打包的执行环境</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E7%83%AD%E6%9B%B4%E6%96%B0"><span class="toc-text">热更新</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%8B%86%E5%8C%85-gt-gt-gt-gt-gt-comm%E6%89%93diff%E5%8C%85-gt-gt-gt-gt-gt-gt-%E6%95%B4%E5%90%88%E5%8C%85"><span class="toc-text">拆包&gt;&gt;&gt;&gt;&gt;comm打diff包&gt;&gt;&gt;&gt;&gt;&gt;整合包</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%86%E5%8C%85%EF%BC%88%E5%9F%BA%E7%A1%80%E5%8C%85%E5%92%8C%E4%B8%9A%E5%8A%A1%E5%8C%85%EF%BC%89"><span class="toc-text">拆包（基础包和业务包）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#comm%E6%89%93%E5%87%BAdiff%E5%8C%85"><span class="toc-text">comm打出diff包</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B4%E5%90%88"><span class="toc-text">整合</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E8%B7%AF%E5%BE%84%E4%BB%A3%E6%9B%BFmoudleId%E8%BF%9B%E8%A1%8C%E5%BC%95%E7%94%A8"><span class="toc-text">为什么要使用路径代替moudleId进行引用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%93%E8%AE%BA%EF%BC%9Ametro%E4%BE%8B%E5%AD%90%E5%AE%9E%E7%8E%B0%EF%BC%8C%E6%97%A0%E6%B3%95%E4%BD%BF%E7%94%A8google-diff%E5%90%88%E5%B9%B6diff%E5%8C%85%EF%BC%8C%E6%89%80%E4%BB%A5metro%E5%AE%8C%E5%85%A8%E6%98%AF%E4%B8%80%E4%B8%AA%E6%8B%86%E5%8C%85%E6%96%B9%E6%A1%88%EF%BC%8C%E9%85%8D%E5%90%88%E4%BD%BF%E7%94%A8google-diff%E7%9A%84%E7%83%AD%E6%9B%B4%E6%96%B0%E6%96%B9%E6%A1%88%E5%8F%AF%E4%BB%A5%E5%AE%9E%E7%8E%B0rn%E7%9A%84%E7%83%AD%E6%9B%B4%E6%96%B0%E3%80%82"><span class="toc-text">结论：metro例子实现，无法使用google-diff合并diff包，所以metro完全是一个拆包方案，配合使用google-diff的热更新方案可以实现rn的热更新。</span></a></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

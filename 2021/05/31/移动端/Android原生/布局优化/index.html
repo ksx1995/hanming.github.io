@@ -1,0 +1,409 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="Android" />
+
+
+<meta name="description" content="[TOC]
+绘画原理Android的绘制主要是借助cpu和gpu结合刷新机制共同完成的
+
+cpu：负责执行measure、layout等方法，计算显示内容
+gpu：负责栅格化（将UI元素绘制在屏..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    布局优化 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="布局优化">
+            
+            布局优化
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/Android/" rel="tag">Android</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/05/31</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>[TOC]</p>
+<h3 id="绘画原理"><a href="#绘画原理" class="headerlink" title="绘画原理"></a>绘画原理</h3><p><strong>Android的绘制主要是借助cpu和gpu结合刷新机制共同完成的</strong></p>
+<ul>
+<li>cpu：负责执行measure、layout等方法，计算显示内容</li>
+<li>gpu：负责栅格化（将UI元素绘制在屏幕上）<br><img src="https://user-gold-cdn.xitu.io/2020/1/14/16fa19bed0589207" alt="image"></li>
+</ul>
+<p>绘制过程使用skia库（2D），硬件本质是采用openGL库进行绘制</p>
+<p>16ms内渲染一次，否则会掉帧</p>
+<h3 id="布局加载原理"><a href="#布局加载原理" class="headerlink" title="布局加载原理"></a>布局加载原理</h3><p>Android中的布局加载入口为setContentView()，分析如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContentView</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="keyword">int</span> layoutResID)</span> </span>&#123;</span><br><span class="line">       getDelegate().setContentView(layoutResID);</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">//AppCompatDelegate.java</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">setContentView</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="keyword">int</span> resId)</span></span>;</span><br></pre></td></tr></table></figure><br>查看抽象接口实现<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContentView</span><span class="params">(<span class="keyword">int</span> resId)</span> </span>&#123;</span><br><span class="line">       ensureSubDecor();</span><br><span class="line">       <span class="comment">//获取content跟布局</span></span><br><span class="line">       ViewGroup contentParent = (ViewGroup) mSubDecor.findViewById(android.R.id.content);</span><br><span class="line">       <span class="comment">//移除所有布局</span></span><br><span class="line">       contentParent.removeAllViews();</span><br><span class="line">       <span class="comment">//加载新布局</span></span><br><span class="line">       LayoutInflater.from(mContext).inflate(resId, contentParent);</span><br><span class="line">       <span class="comment">//接口状态通知</span></span><br><span class="line">       mOriginalWindowCallback.onContentChanged();</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure><br>进入inflate方法：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">inflate</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="keyword">int</span> resource, <span class="meta">@Nullable</span> ViewGroup root)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> inflate(resource, root, root != <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">inflate</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="keyword">int</span> resource, <span class="meta">@Nullable</span> ViewGroup root, <span class="keyword">boolean</span> attachToRoot)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> Resources res = getContext().getResources();</span><br><span class="line">        <span class="keyword">if</span> (DEBUG) &#123;</span><br><span class="line">            Log.d(TAG, <span class="string">&quot;INFLATING from resource: \&quot;&quot;</span> + res.getResourceName(resource) + <span class="string">&quot;\&quot; (&quot;</span></span><br><span class="line">                    + Integer.toHexString(resource) + <span class="string">&quot;)&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> XmlResourceParser parser = res.getLayout(resource);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> inflate(parser, root, attachToRoot);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            parser.close();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure><br>getLayout方法返回一个XmlResourceParser对象：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> XmlResourceParser <span class="title">getLayout</span><span class="params">(<span class="meta">@LayoutRes</span> <span class="keyword">int</span> id)</span> <span class="keyword">throws</span> NotFoundException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> loadXmlResourceParser(id, <span class="string">&quot;layout&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@NonNull</span></span><br><span class="line"><span class="function">XmlResourceParser <span class="title">loadXmlResourceParser</span><span class="params">(<span class="meta">@AnyRes</span> <span class="keyword">int</span> id, <span class="meta">@NonNull</span> String type)</span></span></span><br><span class="line"><span class="function">        <span class="keyword">throws</span> NotFoundException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> TypedValue value = obtainTempTypedValue();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> ResourcesImpl impl = mResourcesImpl;</span><br><span class="line">        impl.getValue(id, value, <span class="keyword">true</span>);</span><br><span class="line">        <span class="keyword">if</span> (value.type == TypedValue.TYPE_STRING) &#123;</span><br><span class="line">            <span class="keyword">return</span> impl.loadXmlResourceParser(value.string.toString(), id,</span><br><span class="line">                    value.assetCookie, type);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NotFoundException(<span class="string">&quot;Resource ID #0x&quot;</span> + Integer.toHexString(id)</span><br><span class="line">                + <span class="string">&quot; type #0x&quot;</span> + Integer.toHexString(value.type) + <span class="string">&quot; is not valid&quot;</span>);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        releaseTempTypedValue(value);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>进入loadXmlResourceParser：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@NonNull</span></span><br><span class="line">   <span class="function">XmlResourceParser <span class="title">loadXmlResourceParser</span><span class="params">(<span class="meta">@NonNull</span> String file, <span class="meta">@AnyRes</span> <span class="keyword">int</span> id, <span class="keyword">int</span> assetCookie,</span></span></span><br><span class="line"><span class="params"><span class="function">           <span class="meta">@NonNull</span> String type)</span></span></span><br><span class="line"><span class="function">           <span class="keyword">throws</span> NotFoundException </span>&#123;</span><br><span class="line">       <span class="keyword">if</span> (id != <span class="number">0</span>) &#123;</span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               <span class="keyword">synchronized</span> (mCachedXmlBlocks) &#123;</span><br><span class="line">                   <span class="keyword">final</span> <span class="keyword">int</span>[] cachedXmlBlockCookies = mCachedXmlBlockCookies;</span><br><span class="line">                   <span class="keyword">final</span> String[] cachedXmlBlockFiles = mCachedXmlBlockFiles;</span><br><span class="line">                   <span class="keyword">final</span> XmlBlock[] cachedXmlBlocks = mCachedXmlBlocks;</span><br><span class="line">                   <span class="comment">// First see if this block is in our cache.</span></span><br><span class="line">                   <span class="keyword">final</span> <span class="keyword">int</span> num = cachedXmlBlockFiles.length;</span><br><span class="line">                   <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; num; i++) &#123;</span><br><span class="line">                       <span class="keyword">if</span> (cachedXmlBlockCookies[i] == assetCookie &amp;&amp; cachedXmlBlockFiles[i] != <span class="keyword">null</span></span><br><span class="line">                               &amp;&amp; cachedXmlBlockFiles[i].equals(file)) &#123;</span><br><span class="line">                           <span class="keyword">return</span> cachedXmlBlocks[i].newParser();</span><br><span class="line">                       &#125;</span><br><span class="line">                   &#125;</span><br><span class="line"></span><br><span class="line">                   <span class="comment">// Not in the cache, create a new block and put it at</span></span><br><span class="line">                   <span class="comment">// the next slot in the cache.</span></span><br><span class="line">                   <span class="keyword">final</span> XmlBlock block = mAssets.openXmlBlockAsset(assetCookie, file);</span><br><span class="line">                   <span class="keyword">if</span> (block != <span class="keyword">null</span>) &#123;</span><br><span class="line">                       <span class="keyword">final</span> <span class="keyword">int</span> pos = (mLastCachedXmlBlockIndex + <span class="number">1</span>) % num;</span><br><span class="line">                       mLastCachedXmlBlockIndex = pos;</span><br><span class="line">                       <span class="keyword">final</span> XmlBlock oldBlock = cachedXmlBlocks[pos];</span><br><span class="line">                       <span class="keyword">if</span> (oldBlock != <span class="keyword">null</span>) &#123;</span><br><span class="line">                           oldBlock.close();</span><br><span class="line">                       &#125;</span><br><span class="line">                       cachedXmlBlockCookies[pos] = assetCookie;</span><br><span class="line">                       cachedXmlBlockFiles[pos] = file;</span><br><span class="line">                       cachedXmlBlocks[pos] = block;</span><br><span class="line">                       <span class="keyword">return</span> block.newParser();</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">               <span class="keyword">final</span> NotFoundException rnf = <span class="keyword">new</span> NotFoundException(<span class="string">&quot;File &quot;</span> + file</span><br><span class="line">                       + <span class="string">&quot; from xml type &quot;</span> + type + <span class="string">&quot; resource ID #0x&quot;</span> + Integer.toHexString(id));</span><br><span class="line">               rnf.initCause(e);</span><br><span class="line">               <span class="keyword">throw</span> rnf;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> NotFoundException(<span class="string">&quot;File &quot;</span> + file + <span class="string">&quot; from xml type &quot;</span> + type + <span class="string">&quot; resource ID #0x&quot;</span></span><br><span class="line">               + Integer.toHexString(id));</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure><br>加载指定布局文件的xml，生成XMLBlock：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*package*/</span> <span class="function"><span class="keyword">final</span> XmlBlock <span class="title">openXmlBlockAsset</span><span class="params">(<span class="keyword">int</span> cookie, String fileName)</span></span></span><br><span class="line"><span class="function">       <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">       <span class="keyword">synchronized</span> (<span class="keyword">this</span>) &#123;</span><br><span class="line">           <span class="keyword">if</span> (!mOpen) &#123;</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;Assetmanager has been closed&quot;</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">long</span> xmlBlock = openXmlAssetNative(cookie, fileName);</span><br><span class="line">           <span class="keyword">if</span> (xmlBlock != <span class="number">0</span>) &#123;</span><br><span class="line">               XmlBlock res = <span class="keyword">new</span> XmlBlock(<span class="keyword">this</span>, xmlBlock);</span><br><span class="line">               incRefsLocked(res.hashCode());</span><br><span class="line">               <span class="keyword">return</span> res;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> FileNotFoundException(<span class="string">&quot;Asset XML file: &quot;</span> + fileName);</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="function"><span class="keyword">private</span> <span class="keyword">native</span> <span class="keyword">final</span> <span class="keyword">long</span> <span class="title">openXmlAssetNative</span><span class="params">(<span class="keyword">int</span> cookie, String fileName)</span></span>;</span><br></pre></td></tr></table></figure><br>最终指向了native方法</p>
+<p>获取到XMLResourceParser后，进行渲染：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> View <span class="title">inflate</span><span class="params">(XmlPullParser parser, <span class="meta">@Nullable</span> ViewGroup root, <span class="keyword">boolean</span> attachToRoot)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (mConstructorArgs) &#123;</span><br><span class="line">        Trace.traceBegin(Trace.TRACE_TAG_VIEW, <span class="string">&quot;inflate&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">final</span> Context inflaterContext = mContext;</span><br><span class="line">        <span class="keyword">final</span> AttributeSet attrs = Xml.asAttributeSet(parser);</span><br><span class="line">        Context lastContext = (Context) mConstructorArgs[<span class="number">0</span>];</span><br><span class="line">        mConstructorArgs[<span class="number">0</span>] = inflaterContext;</span><br><span class="line">        View result = root;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// Look for the root node.</span></span><br><span class="line">            <span class="keyword">int</span> type;</span><br><span class="line">            <span class="keyword">while</span> ((type = parser.next()) != XmlPullParser.START_TAG &amp;&amp;</span><br><span class="line">                    type != XmlPullParser.END_DOCUMENT) &#123;</span><br><span class="line">                <span class="comment">// Empty</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (type != XmlPullParser.START_TAG) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> InflateException(parser.getPositionDescription()</span><br><span class="line">                        + <span class="string">&quot;: No start tag found!&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">final</span> String name = parser.getName();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (DEBUG) &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;**************************&quot;</span>);</span><br><span class="line">                System.out.println(<span class="string">&quot;Creating root view: &quot;</span></span><br><span class="line">                        + name);</span><br><span class="line">                System.out.println(<span class="string">&quot;**************************&quot;</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">//如果是merge标签，查看是否是当前布局的父节点，不是的话抛出异常</span></span><br><span class="line">            <span class="keyword">if</span> (TAG_MERGE.equals(name)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (root == <span class="keyword">null</span> || !attachToRoot) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> InflateException(<span class="string">&quot;&lt;merge /&gt; can be used only with a valid &quot;</span></span><br><span class="line">                            + <span class="string">&quot;ViewGroup root and attachToRoot=true&quot;</span>);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                rInflate(parser, root, inflaterContext, attrs, <span class="keyword">false</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="comment">// Temp is the root view that was found in the xml</span></span><br><span class="line">                <span class="comment">//获取xml中的根节点</span></span><br><span class="line">                <span class="keyword">final</span> View temp = createViewFromTag(root, name, inflaterContext, attrs);</span><br><span class="line">                &#125;</span><br><span class="line">            ...</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>使用XmlPull解析布局，如果是merge标签，merge节点不是当前布局的父节点，则抛出异常，进入CreateViewFromTag：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> View <span class="title">createViewFromTag</span><span class="params">(View parent, String name, Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">return</span> createViewFromTag(parent, name, context, attrs, <span class="keyword">false</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="function">View <span class="title">createViewFromTag</span><span class="params">(View parent, String name, Context context, AttributeSet attrs,</span></span></span><br><span class="line"><span class="params"><span class="function">          <span class="keyword">boolean</span> ignoreThemeAttr)</span> </span>&#123;</span><br><span class="line">      </span><br><span class="line">      ......</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">          View view;</span><br><span class="line">          <span class="keyword">if</span> (mFactory2 != <span class="keyword">null</span>) &#123;</span><br><span class="line">              view = mFactory2.onCreateView(parent, name, context, attrs);</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (mFactory != <span class="keyword">null</span>) &#123;</span><br><span class="line">              view = mFactory.onCreateView(name, context, attrs);</span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">              view = <span class="keyword">null</span>;</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (view == <span class="keyword">null</span> &amp;&amp; mPrivateFactory != <span class="keyword">null</span>) &#123;</span><br><span class="line">              view = mPrivateFactory.onCreateView(parent, name, context, attrs);</span><br><span class="line">          &#125;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (view == <span class="keyword">null</span>) &#123;</span><br><span class="line">              <span class="keyword">final</span> Object lastContext = mConstructorArgs[<span class="number">0</span>];</span><br><span class="line">              mConstructorArgs[<span class="number">0</span>] = context;</span><br><span class="line">              <span class="keyword">try</span> &#123;</span><br><span class="line">                  <span class="keyword">if</span> (-<span class="number">1</span> == name.indexOf(<span class="string">&#x27;.&#x27;</span>)) &#123;</span><br><span class="line">                      view = onCreateView(parent, name, attrs);</span><br><span class="line">                  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                      view = createView(name, <span class="keyword">null</span>, attrs);</span><br><span class="line">                  &#125;</span><br><span class="line">              &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                  mConstructorArgs[<span class="number">0</span>] = lastContext;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      ...</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure><br>使用mFactory2、mFactory、mPrivateFactory创建view，如果null的情况下，就会调用createView方法，内部采用反射创建节点，过多的反射会造成性能问题，可以进行优化。</p>
+<h3 id="获取界面布局耗时"><a href="#获取界面布局耗时" class="headerlink" title="获取界面布局耗时"></a>获取界面布局耗时</h3><ol>
+<li>手动埋点，打印时间</li>
+<li>AOP打印setContView的时间</li>
+<li>重写LayoutInflaterCompat.setFactory2方法，打印每一个控件的耗时时间<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(<span class="meta">@Nullable</span> Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用LayoutInflaterCompat.Factory2全局监控Activity界面每一个控件的加载耗时，</span></span><br><span class="line">    <span class="comment">// 也可以做全局的自定义控件替换处理，比如：将TextView全局替换为自定义的TextView。</span></span><br><span class="line">    LayoutInflaterCompat.setFactory2(getLayoutInflater(), <span class="keyword">new</span> LayoutInflater.Factory2() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(View parent, String name, Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (TextUtils.equals(name, <span class="string">&quot;TextView&quot;</span>)) &#123;</span><br><span class="line">                <span class="comment">// 生成自定义TextView</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">long</span> time = System.currentTimeMillis();</span><br><span class="line">            <span class="comment">// 1</span></span><br><span class="line">            View view = getDelegate().createView(parent, name, context, attrs);</span><br><span class="line">            LogHelper.i(name + <span class="string">&quot; cost &quot;</span> + (System.currentTimeMillis() - time));</span><br><span class="line">            <span class="keyword">return</span> view;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> View <span class="title">onCreateView</span><span class="params">(String name, Context context, AttributeSet attrs)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//也可以直接调用这个方法</span></span><br><span class="line"><span class="comment">//    LayoutInflater.from(this).setFactory2(new LayoutInflater.Factory2() &#123;</span></span><br><span class="line"><span class="comment">//            @Override</span></span><br><span class="line"><span class="comment">//            public View onCreateView(View parent, String name, Context context, AttributeSet attrs) &#123;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//                if (TextUtils.equals(name, &quot;TextView&quot;)) &#123;</span></span><br><span class="line"><span class="comment">//                    // 生成自定义TextView</span></span><br><span class="line"><span class="comment">//                &#125;</span></span><br><span class="line"><span class="comment">//                long time = System.currentTimeMillis();</span></span><br><span class="line"><span class="comment">//                // 1</span></span><br><span class="line"><span class="comment">//                View view = getDelegate().createView(parent, name, context, attrs);</span></span><br><span class="line"><span class="comment">//                AppLog.E(name + &quot; cost &quot; + (System.currentTimeMillis() - time));</span></span><br><span class="line"><span class="comment">//                return view;</span></span><br><span class="line"><span class="comment">//            &#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//            @Override</span></span><br><span class="line"><span class="comment">//            public View onCreateView(String name, Context context, AttributeSet attrs) &#123;</span></span><br><span class="line"><span class="comment">//               return null;</span></span><br><span class="line"><span class="comment">//            &#125;</span></span><br><span class="line"><span class="comment">//        &#125;);</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2、setFactory2方法需在super.onCreate方法前调用，否则无效  </span></span><br><span class="line">    <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">    setContentView(getLayoutId());</span><br><span class="line">    unBinder = ButterKnife.bind(<span class="keyword">this</span>);</span><br><span class="line">    mActivity = <span class="keyword">this</span>;</span><br><span class="line">    ActivityCollector.getInstance().addActivity(<span class="keyword">this</span>);</span><br><span class="line">    onViewCreated();</span><br><span class="line">    initToolbar();</span><br><span class="line">    initEventAndData();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="优化工具"><a href="#优化工具" class="headerlink" title="优化工具"></a>优化工具</h3><h4 id="Lint"><a href="#Lint" class="headerlink" title="Lint"></a>Lint</h4><p>Android Studio自带工具，可以进行代码校验，发现代码结构/质量问题</p>
+<h4 id="Layout-Inspector"><a href="#Layout-Inspector" class="headerlink" title="Layout Inspector"></a>Layout Inspector</h4><p>Android Studio推荐布局检测工具，可以查看整个布局的层级，进而优化处理</p>
+<h4 id="GPU过度绘制"><a href="#GPU过度绘制" class="headerlink" title="GPU过度绘制"></a>GPU过度绘制</h4><p>手机中打开开发者选项-开启GPU过度绘制</p>
+<h3 id="布局优化的必要性"><a href="#布局优化的必要性" class="headerlink" title="布局优化的必要性"></a>布局优化的必要性</h3><ol>
+<li>减少页面卡顿，提高流畅度</li>
+<li>减少线上bug产出</li>
+</ol>
+<h3 id="总体原则"><a href="#总体原则" class="headerlink" title="总体原则"></a>总体原则</h3><ol>
+<li>避免层间嵌套</li>
+<li>减少绘制时间，三个方法的执行时间</li>
+</ol>
+<h3 id="优化方法"><a href="#优化方法" class="headerlink" title="优化方法"></a>优化方法</h3><ol>
+<li>使用include标签重用公共布局</li>
+<li><p>使用merge减少视图层级</p>
+<p>当使用的是merge时，连续两个布局相似会合并，减少层级。</p>
+</li>
+<li>使用viewStub延迟加载，减少资源浪费</li>
+<li>简单布局使用LinearLayout，复杂布局使用RelativeLayout或者ConstraintLayout减少层级嵌套。</li>
+<li>善用控件属性<ul>
+<li>TextView实现图片+文字显示</li>
+<li>使用LinearLayout自带的分割线</li>
+</ul>
+</li>
+<li>使用space控件</li>
+<li>尽量少使用wrap_content，增加计算成本，绘制过久</li>
+</ol>
+<h3 id="主要布局比较"><a href="#主要布局比较" class="headerlink" title="主要布局比较"></a>主要布局比较</h3><table>
+<thead>
+<tr>
+<th>名称</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RelativeLayout</td>
+<td>减少层级嵌套</td>
+<td>onDraw执行两次，耗时</td>
+</tr>
+<tr>
+<td>LinearLayout</td>
+<td>不使用weight，onDraw执行一次</td>
+<td>布局时容易层级嵌套</td>
+</tr>
+<tr>
+<td>FrameLayout</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>ConstraintLayout</td>
+<td>减少层级 + 比例布局</td>
+<td>耗时</td>
+</tr>
+</tbody>
+</table>
+<p>总结：性能好的布局，FrameLayout和LinearLayout<br>功能复杂，需要层级嵌套使用RelativeLayout或者ConstraintLayout。</p>
+<blockquote>
+<p>优先考虑层级问题，在考虑单个布局性能问题</p>
+</blockquote>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E5%8C%85%E4%BD%93%E4%BC%98%E5%8C%96/" class="pre-post btn btn-default" title='包体优化'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            包体优化</span>
+    </a>
+    
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="next-post btn btn-default" title='设计模式'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            设计模式</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%98%E7%94%BB%E5%8E%9F%E7%90%86"><span class="toc-text">绘画原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%83%E5%B1%80%E5%8A%A0%E8%BD%BD%E5%8E%9F%E7%90%86"><span class="toc-text">布局加载原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%95%8C%E9%9D%A2%E5%B8%83%E5%B1%80%E8%80%97%E6%97%B6"><span class="toc-text">获取界面布局耗时</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E5%B7%A5%E5%85%B7"><span class="toc-text">优化工具</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Lint"><span class="toc-text">Lint</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Layout-Inspector"><span class="toc-text">Layout Inspector</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#GPU%E8%BF%87%E5%BA%A6%E7%BB%98%E5%88%B6"><span class="toc-text">GPU过度绘制</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%83%E5%B1%80%E4%BC%98%E5%8C%96%E7%9A%84%E5%BF%85%E8%A6%81%E6%80%A7"><span class="toc-text">布局优化的必要性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%BB%E4%BD%93%E5%8E%9F%E5%88%99"><span class="toc-text">总体原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95"><span class="toc-text">优化方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E8%A6%81%E5%B8%83%E5%B1%80%E6%AF%94%E8%BE%83"><span class="toc-text">主要布局比较</span></a></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

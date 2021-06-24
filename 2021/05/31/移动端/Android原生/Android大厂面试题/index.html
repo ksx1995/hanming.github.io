@@ -1,0 +1,542 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="Android" />
+
+
+<meta name="description" content="京1:
+
+butterknife原理，R2文件？
+Handler异步消息，同步屏障？同步消息？looper.perpare()何时创建？message.obtain()?
+Vsync，垂直同步信..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    Android大厂面试题 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Android大厂面试题">
+            
+            Android大厂面试题
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/Android/" rel="tag">Android</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/05/31</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>京1:</p>
+<ol>
+<li>butterknife原理，R2文件？</li>
+<li>Handler异步消息，同步屏障？同步消息？looper.perpare()何时创建？message.obtain()?</li>
+<li>Vsync，垂直同步信号？</li>
+<li>UI滑动渲染优化？</li>
+<li>内存泄漏？leakcarray原理？</li>
+<li>oom的条件？<ol>
+<li>开辟多个线程导致oom？</li>
+</ol>
+</li>
+<li>bitmap的存储形式在系统中的存储？存储在哪？</li>
+<li>布局优化？LinearLayout   draw几次？</li>
+<li>IPC机制，binder机制的理解？为什么使用线程池？（一个服务端对多个客户端）</li>
+<li>flutter渲染机制？flutter的树？</li>
+</ol>
+<p>京2:</p>
+<ol>
+<li>移动端自动化开发</li>
+<li>EventBus原理？优点？缺点？切换线程的方式</li>
+<li>ViewModel+LiveData</li>
+<li>音箱和手机的差异化？android版本，厂商room，客户群体不同</li>
+<li>apk瘦身？</li>
+<li><strong>启动优化的时间检测？启动器优化方式</strong></li>
+<li>组件化？如何设计一个组件</li>
+</ol>
+<p>小米1：</p>
+<ol>
+<li><p>Activity的生命周期？activityA在下拉框的时候的生命周期？（不变化）onDestory有立即执行吗？</p>
+</li>
+<li><p>activity启动后在最后一帧绘制在哪？</p>
+</li>
+<li><p>android启动打点？AOP？启动优化？开启一个线程？AMS，反射？如何对函数进行插桩？</p>
+<p>ASM对.class文件修改，生成.dex文件前搞定，在.class和.dex文件转化中间作修改</p>
+</li>
+<li><p>leakcanary原理？自己如何做内存泄漏器？各个函数之间的耗时情况？</p>
+</li>
+<li><p>亮点？有向无环图？contentprovider的初始化？</p>
+</li>
+<li><p>Handler内存泄漏的原因？怎么处理？handler持有Activity强引用，messageQueue持有handler的强引用</p>
+</li>
+<li><p>view的绘制？dispatchDraw()和onDraw()的执行顺序？</p>
+</li>
+<li><p>如果绘制一个圆，保证这个圆的中间不被绘制？cavas进行裁剪，画布上就缺一块，则子view绘制不上</p>
+</li>
+<li><p>view的事件分发？如果dispatch返回true，会拦截到onInterrcept和onTouch</p>
+</li>
+<li><p>bitmap的优化？bitmap的大小的计算？2x的大小图片放大1x的图片中，bitmap会变大</p>
+</li>
+<li><p>线程池？阻塞的处理？exectue和submit的区别，如何捕获线程池错误（ThreadFactory）</p>
+</li>
+<li><p>生产者消费者通知？</p>
+</li>
+<li><p>线程同步？加锁，Sychronized，ReentrantLock</p>
+</li>
+<li><p>Hashmap，hash值计算？为什么这么计算？arraymap和hashmap？</p>
+</li>
+<li><p>数组和链表的区别？</p>
+</li>
+<li><p>https加密形式</p>
+</li>
+</ol>
+<p>小米2面：</p>
+<ol>
+<li>启动优化？bitmap预加载？如何更快加载图片？还有别的什么优化？</li>
+<li>Glide的into方法是怎么执行的，如何显示到imageView中的？</li>
+<li>Glide的加载流程？fragment如何绑定？imageView正在加载，再次加载另一个图片，具体会执行什么？</li>
+<li>Android启动流程？Activity启动流程？</li>
+<li>ViewModel？LiveData的理解 ？mvvm的理解？</li>
+<li>网络请求异步框架？线程池？</li>
+<li>链表反转（逆置）</li>
+</ol>
+<p>Yy1:</p>
+<ol>
+<li><p>okhttp io的方式？okio，java中io的方式？责任链模式？连接池复用？</p>
+</li>
+<li><p>Glide的缓存结构？为什么要用activieResource？</p>
+</li>
+<li><p>EventBus的简述？字节码=.class文件，注解方式？</p>
+</li>
+<li><p>RecyclerView缓存形式？</p>
+</li>
+<li><p>MotionLayout的内部原理</p>
+</li>
+<li><p>Mvvm需要注意什么？内存泄漏？持有view的引用</p>
+</li>
+<li><p>leakCanary原理，gc间隔=5s，在idleHandler中使用延迟5s的操作，大概是主线程闲置后在等待5s中进行验证后执行gc？Fragment怎么监听内存泄漏的？fragmentManager.registerFragmentLifecycleCallbacks中检测</p>
+</li>
+<li><p>apk瘦身？so库合并</p>
+<p>先把所有要打包的库编译生成静态库，然后使用如下命令把它们合并成一个*.so:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -shared -o c.so -Wl,--whole-archive a.a b.a -Wl,--no-whole-archive</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>启动优化？其他的优化框架，</p>
+</li>
+<li><p>线程，进程，协程？时间分片？协程是怎么做的？那个io？</p>
+</li>
+<li><p>handler机制？子线程中如何使用handler？handler中的Looper.prepareMain和Looper.prepare的区别？主线程永不退出，死循环？同步屏障？</p>
+</li>
+</ol>
+<p>Yy2:</p>
+<ol>
+<li>音频协议？</li>
+<li>协程，进程，线程的区别？</li>
+<li>mvvm？组件化？</li>
+<li>websocket协议和http协议的区别？</li>
+<li>butterknife原理？注解的三种形式？</li>
+<li>动态代理的方式？2中？动态代理的关联？</li>
+<li>类型擦出？范性？</li>
+<li>类加载过程？类什么时候初始化？静态类的初始化过程？</li>
+<li>编译器优化？</li>
+<li>GCroot？栈溢出？（递归）</li>
+<li>java异常有几种？可以捕获oom异常吗？可以，在bitmap中如果触发oom可以进行try catch</li>
+<li>动画？差值器，估值器？</li>
+<li>二叉树之字形打印</li>
+</ol>
+<p>581:</p>
+<ol>
+<li><p>组件化ARouter框架原理？</p>
+<p>编译时注解生成类文件，存储全局路由管理，通过反射创建对象。</p>
+<p>如果是Activity，通过Intent进行跳转传参，Fragment，BroadCastReceiver，Service等都是通过反射创建对象的</p>
+</li>
+<li><p>LiveData，viewModel机制，如何绑定生命周期，viewModel中持久化是怎么做的，LiveData中的粘性事件</p>
+<p>粘性事件是通过版本号控制的，当进入active状态后，会比对version版本，进行订阅者的通知</p>
+</li>
+<li><p>Activity的启动过程</p>
+</li>
+<li><p>RecyclerView机制</p>
+</li>
+<li><p>Handler机制</p>
+</li>
+<li><p>java中锁的机制，volatile的可见性怎么理解？Synchronized怎么理解？自旋锁怎么理解？ReentrantLock怎么理解？</p>
+</li>
+<li><p>kotlin中的协程？</p>
+<p>kotlin中协程通过挂起函数来实现协程的处理，使用CPS变换，suspend</p>
+<p>每个挂起函数都会被编译为Continuation ，将函数体编译为状态机</p>
+</li>
+<li><p>ASM</p>
+</li>
+<li><p>flutter理解？fish-redux的分层？数据流向？</p>
+<p>view—–&gt;action—-&gt;effect—–&gt;reducer—–&gt;store—–&gt;view</p>
+</li>
+</ol>
+<p>58 2:</p>
+<ol>
+<li>项目相关。。。</li>
+</ol>
+<p>36012:</p>
+<ol>
+<li><p>Fragment切换，add和replace，复用的问题？</p>
+</li>
+<li><p>Fragment可见性准确保证？</p>
+</li>
+<li><p>Fragment构造传参的劣势？</p>
+<p>在Activity异常退出重建Fragment的时候，会执行Fragment的无参构造方法，如果通过setArguments进行传递参数，Activity在构造Fragment时会通过反射午餐构造实力</p>
+</li>
+<li><p>内联优化？</p>
+</li>
+<li><p>aapt1和aapt2的区别</p>
+<p>aapt1进行全量编译</p>
+<p>aapt2进行差量编译</p>
+</li>
+<li><p>垃圾加载的GC root</p>
+</li>
+<li><p>LRU算法怎么实现的</p>
+</li>
+<li><p>java中的容器有哪些？线程安全的有哪些？</p>
+<p>Vector   与ArrayList几乎相同，但是线程安全</p>
+<p>Stack     继承自Vector</p>
+<p>CopyOnWriteArrayList 写实拷贝</p>
+<p>ConcurrentLinkedQueue　基础链表同步队列</p>
+<p>LinkedBlockingQueue</p>
+<p>HashTable</p>
+<p>ConcurrentHashMap</p>
+</li>
+</ol>
+<p>58 3:</p>
+<ol>
+<li>对排序？</li>
+<li>http请求过程，https的过程</li>
+<li>数组和链表的区别</li>
+<li>栈中调用方法的过程</li>
+<li>LRU算法的实现</li>
+</ol>
+<p>美团 1:</p>
+<p>携程 1:</p>
+<p>快手 1:</p>
+<p>知乎 1:</p>
+<ol>
+<li>Activity的生命后期</li>
+<li>onConfigurationChanged？其他回掉时机？onSaveInstanceState回调？分屏？</li>
+<li>ARouter？</li>
+<li>Fragment的生命周期？onCreateView可以返回null吗？</li>
+<li>fragment怎么初始化？fragment为什么不推荐携带参数？androidx中提供fragment传参？Fragment重建？</li>
+<li>viewModel持久化？viewmodel重建？可以存储Bundle？</li>
+<li>java内存模型？volatile原理？可见性，非原子性，禁止指令重排</li>
+<li>组件化开发？</li>
+<li>二叉树镜像？</li>
+</ol>
+<p>知乎 2:</p>
+<ol>
+<li>mvvm的理解</li>
+<li>离开公司的原因</li>
+<li>未来的方向，2c方向，架构方向</li>
+<li>架构师主要负责，技术选型</li>
+<li>为什么选择知乎？</li>
+<li>知乎界面的分析+选型+排期</li>
+<li>你的优势，为什么给你发offer？</li>
+<li>android启动器？线程池选型？</li>
+<li>大文件查找方案？</li>
+<li>整数的逆置，头和尾是0的情况排除</li>
+</ol>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/LiveData%E5%92%8CViewModel%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="pre-post btn btn-default" title='LiveData和ViewModel源码分析'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            LiveData和ViewModel源码分析</span>
+    </a>
+    
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E9%9D%A2%E8%AF%95%E6%8C%87%E5%8D%97/" class="next-post btn btn-default" title='面试指南'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            面试指南</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <p>暂无目录</p>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,380 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="Android,源码分析" />
+
+
+<meta name="description" content="[TOC]
+使用1234567891011121314@BindView(R.id.about_titleView)TitleView aboutTitleView;@BindView(R.id..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    Butterknife源码解析 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="Butterknife源码解析">
+            
+            Butterknife源码解析
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/Android/" rel="tag">Android</a> <a class="tag-none-link" href="/tags/%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="tag">源码分析</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2020/06/04</span>
+    </span>
+    
+    
+</div>
+        
+        
+        <p class="fa fa-exclamation-triangle warning">
+            本文于<strong>
+                385</strong>
+            天之前发表，文中内容可能已经过时。
+        </p>
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <p>[TOC]</p>
+<h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@BindView(R.id.about_titleView)</span></span><br><span class="line">TitleView aboutTitleView;</span><br><span class="line"><span class="meta">@BindView(R.id.view_about)</span></span><br><span class="line">LinearLayout viewAbout;</span><br><span class="line"></span><br><span class="line">Unbinder mBinder;</span><br><span class="line"></span><br><span class="line">onCreate()&#123;</span><br><span class="line">    mBinder = ButterKnife.bind(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">onDestory()&#123;</span><br><span class="line">    mBinder.unbind();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用方法极其简单，减少findViewById的重复代码</p>
+<p>BindView源码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Retention(CLASS)</span> <span class="meta">@Target(FIELD)</span></span><br><span class="line"><span class="keyword">public</span> <span class="meta">@interface</span> BindView &#123;</span><br><span class="line">  <span class="comment">/** View ID to which the field will be bound. */</span></span><br><span class="line">  <span class="meta">@IdRes</span> <span class="function"><span class="keyword">int</span> <span class="title">value</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="源码解析"><a href="#源码解析" class="headerlink" title="源码解析"></a>源码解析</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ButterKnife.bind(<span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+<p>进入bind方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@NonNull</span> <span class="meta">@UiThread</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Unbinder <span class="title">bind</span><span class="params">(<span class="meta">@NonNull</span> Activity target)</span> </span>&#123;</span><br><span class="line">  View sourceView = target.getWindow().getDecorView();</span><br><span class="line">  <span class="keyword">return</span> createBinding(target, sourceView);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取当前该activity的window上的decorView（获取最顶层view），创建绑定操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> Unbinder <span class="title">createBinding</span><span class="params">(<span class="meta">@NonNull</span> Object target, <span class="meta">@NonNull</span> View source)</span> </span>&#123;</span><br><span class="line">  Class&lt;?&gt; targetClass = target.getClass();</span><br><span class="line">  <span class="keyword">if</span> (debug) Log.d(TAG, <span class="string">&quot;Looking up binding for &quot;</span> + targetClass.getName());</span><br><span class="line">  Constructor&lt;? extends Unbinder&gt; constructor = findBindingConstructorForClass(targetClass);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (constructor == <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">return</span> Unbinder.EMPTY;</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">return</span> constructor.newInstance(target, source);</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>进入findBindingConstructorForClass方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@VisibleForTesting</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">final</span> Map&lt;Class&lt;?&gt;, Constructor&lt;? extends Unbinder&gt;&gt; BINDINGS = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line"><span class="meta">@Nullable</span> <span class="meta">@CheckResult</span> <span class="meta">@UiThread</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> Constructor&lt;? extends Unbinder&gt; findBindingConstructorForClass(Class&lt;?&gt; cls) &#123;</span><br><span class="line">    <span class="comment">//从缓存中获取绑定关系（key--class类,value--构造函数）</span></span><br><span class="line">  Constructor&lt;? extends Unbinder&gt; bindingCtor = BINDINGS.get(cls);</span><br><span class="line">  <span class="keyword">if</span> (bindingCtor != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (debug) Log.d(TAG, <span class="string">&quot;HIT: Cached in binding map.&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> bindingCtor;</span><br><span class="line">  &#125;</span><br><span class="line">    <span class="comment">//获取类名</span></span><br><span class="line">  String clsName = cls.getName();</span><br><span class="line">    <span class="comment">//排除android系统类和java系统类</span></span><br><span class="line">  <span class="keyword">if</span> (clsName.startsWith(<span class="string">&quot;android.&quot;</span>) || clsName.startsWith(<span class="string">&quot;java.&quot;</span>)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (debug) Log.d(TAG, <span class="string">&quot;MISS: Reached framework class. Abandoning search.&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">      <span class="comment">//加载一个className_ViewBinding类</span></span><br><span class="line">    Class&lt;?&gt; bindingClass = cls.getClassLoader().loadClass(clsName + <span class="string">&quot;_ViewBinding&quot;</span>);</span><br><span class="line">    <span class="comment">//noinspection unchecked</span></span><br><span class="line">      <span class="comment">//通过反射获取该类的构造函数</span></span><br><span class="line">    bindingCtor = (Constructor&lt;? extends Unbinder&gt;) bindingClass.getConstructor(cls, View.class);</span><br><span class="line">    <span class="keyword">if</span> (debug) Log.d(TAG, <span class="string">&quot;HIT: Loaded binding class and constructor.&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">catch</span> (ClassNotFoundException e) &#123;</span><br><span class="line">    <span class="keyword">if</span> (debug) Log.d(TAG, <span class="string">&quot;Not found. Trying superclass &quot;</span> + cls.getSuperclass().getName());</span><br><span class="line">    bindingCtor = findBindingConstructorForClass(cls.getSuperclass());</span><br><span class="line">  &#125; <span class="keyword">catch</span> (NoSuchMethodException e) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">&quot;Unable to find binding constructor for &quot;</span> + clsName, e);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//将构造器信息放入缓存中</span></span><br><span class="line">  BINDINGS.put(cls, bindingCtor);</span><br><span class="line">  <span class="keyword">return</span> bindingCtor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最终生成一个_ViewBinding类<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AboutActivity_ViewBinding</span> <span class="keyword">implements</span> <span class="title">Unbinder</span> </span>&#123;</span><br><span class="line">  <span class="keyword">private</span> AboutActivity target;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@UiThread</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">AboutActivity_ViewBinding</span><span class="params">(AboutActivity target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>(target, target.getWindow().getDecorView());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@UiThread</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="title">AboutActivity_ViewBinding</span><span class="params">(AboutActivity target, View source)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.target = target;</span><br><span class="line"></span><br><span class="line">    target.aboutTitleView = Utils.findRequiredViewAsType(source, R.id.about_titleView, <span class="string">&quot;field &#x27;aboutTitleView&#x27;&quot;</span>, TitleView.class);</span><br><span class="line">    target.viewAbout = Utils.findRequiredViewAsType(source, R.id.view_about, <span class="string">&quot;field &#x27;viewAbout&#x27;&quot;</span>, LinearLayout.class);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="meta">@CallSuper</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">unbind</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    AboutActivity target = <span class="keyword">this</span>.target;</span><br><span class="line">    <span class="keyword">if</span> (target == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">&quot;Bindings already cleared.&quot;</span>);</span><br><span class="line">    <span class="keyword">this</span>.target = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    target.aboutTitleView = <span class="keyword">null</span>;</span><br><span class="line">    target.viewAbout = <span class="keyword">null</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>总结：bind方法后，新建一个ViewBinding类，用来做findviewById，onClick等操作，将注解节省的步骤在该类的构造方法中执行，当然这里的构造函数都是注解自动生成的，所以，是怎么样的操作实现这个类？</p>
+<h4 id="ViewBinding类是怎么生成的？"><a href="#ViewBinding类是怎么生成的？" class="headerlink" title="_ViewBinding类是怎么生成的？"></a>_ViewBinding类是怎么生成的？</h4><p>这里要介绍一个注解器，ButterKnifeProcessor，这个注解器是解析注解，生成ViewBinding类的具体代码。</p>
+<h5 id="init"><a href="#init" class="headerlink" title="init"></a>init</h5><p>初始化调用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">(ProcessingEnvironment env)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.init(env);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//获取viewBinding类</span></span><br><span class="line">    String sdk = env.getOptions().get(OPTION_SDK_INT);</span><br><span class="line">    <span class="keyword">if</span> (sdk != <span class="keyword">null</span>) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">this</span>.sdk = Integer.parseInt(sdk);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span><br><span class="line">        env.getMessager()</span><br><span class="line">            .printMessage(Kind.WARNING, <span class="string">&quot;Unable to parse supplied minSdk option &#x27;&quot;</span></span><br><span class="line">                + sdk</span><br><span class="line">                + <span class="string">&quot;&#x27;. Falling back to API 1 support.&quot;</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//是否是debug模式</span></span><br><span class="line">    debuggable = !<span class="string">&quot;false&quot;</span>.equals(env.getOptions().get(OPTION_DEBUGGABLE));</span><br><span class="line"></span><br><span class="line">    typeUtils = env.getTypeUtils();</span><br><span class="line">    filer = env.getFiler();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">      trees = Trees.instance(processingEnv);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IllegalArgumentException ignored) &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// Get original ProcessingEnvironment from Gradle-wrapped one or KAPT-wrapped one.</span></span><br><span class="line">        <span class="keyword">for</span> (Field field : processingEnv.getClass().getDeclaredFields()) &#123;</span><br><span class="line">          <span class="keyword">if</span> (field.getName().equals(<span class="string">&quot;delegate&quot;</span>) || field.getName().equals(<span class="string">&quot;processingEnv&quot;</span>)) &#123;</span><br><span class="line">            field.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">            ProcessingEnvironment javacEnv = (ProcessingEnvironment) field.get(processingEnv);</span><br><span class="line">            trees = Trees.instance(javacEnv);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125; <span class="keyword">catch</span> (Throwable ignored2) &#123;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>该方法主要是获取注解所要生成的viewBing类并进行绑定，遍历java源代码，获取所有的Element元素</p>
+<h5 id="process"><a href="#process" class="headerlink" title="process"></a>process</h5><p>实际处理方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">process</span><span class="params">(Set&lt;? extends TypeElement&gt; elements, RoundEnvironment env)</span> </span>&#123;</span><br><span class="line">    <span class="comment">//获取注解类型Element和程序代码对应关系</span></span><br><span class="line">    Map&lt;TypeElement, BindingSet&gt; bindingMap = findAndParseTargets(env);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;TypeElement, BindingSet&gt; entry : bindingMap.entrySet()) &#123;</span><br><span class="line">      TypeElement typeElement = entry.getKey();</span><br><span class="line">      BindingSet binding = entry.getValue();</span><br><span class="line"></span><br><span class="line">      JavaFile javaFile = binding.brewJava(sdk, debuggable);</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">        javaFile.writeTo(filer);</span><br><span class="line">      &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        error(typeElement, <span class="string">&quot;Unable to write binding for type %s: %s&quot;</span>, typeElement, e.getMessage());</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>BindingSet：对应注解类型的绑定配置</p>
+<ol>
+<li>通过findAndParseTargets获取注解类型Element和配置的相关信息</li>
+<li>遍历Map，生成JavaFile</li>
+<li>生成_ViewBinding文件，将javaFile写入</li>
+</ol>
+<p>进入findAndParseTargets中：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Map&lt;TypeElement, BindingSet&gt; <span class="title">findAndParseTargets</span><span class="params">(RoundEnvironment env)</span> </span>&#123;</span><br><span class="line">   Map&lt;TypeElement, BindingSet.Builder&gt; builderMap = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">   Set&lt;TypeElement&gt; erasedTargetNames = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">   scanForRClasses(env);</span><br><span class="line">   </span><br><span class="line">   ......</span><br><span class="line"></span><br><span class="line">   <span class="comment">// Process each @BindView element.</span></span><br><span class="line">   <span class="comment">//获取BindView注解修饰的Element对象</span></span><br><span class="line">   <span class="keyword">for</span> (Element element : env.getElementsAnnotatedWith(BindView.class)) &#123;</span><br><span class="line">     <span class="comment">// we don&#x27;t SuperficialValidation.validateElement(element)</span></span><br><span class="line">     <span class="comment">// so that an unresolved View type can be generated by later processing rounds</span></span><br><span class="line">     <span class="keyword">try</span> &#123;</span><br><span class="line">       parseBindView(element, builderMap, erasedTargetNames);</span><br><span class="line">     &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">       logParsingError(element, BindView.class, e);</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   .......</span><br><span class="line"></span><br><span class="line">   <span class="comment">// Process each annotation that corresponds to a listener.</span></span><br><span class="line">   <span class="comment">//处理监听器注解类型</span></span><br><span class="line">   <span class="keyword">for</span> (Class&lt;? extends Annotation&gt; listener : LISTENERS) &#123;</span><br><span class="line">     findAndParseListener(env, listener, builderMap, erasedTargetNames);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="comment">// Associate superclass binders with their subclass binders. This is a queue-based tree walk</span></span><br><span class="line">   <span class="comment">// which starts at the roots (superclasses) and walks to the leafs (subclasses).</span></span><br><span class="line">   Deque&lt;Map.Entry&lt;TypeElement, BindingSet.Builder&gt;&gt; entries =</span><br><span class="line">       <span class="keyword">new</span> ArrayDeque&lt;&gt;(builderMap.entrySet());</span><br><span class="line">   Map&lt;TypeElement, BindingSet&gt; bindingMap = <span class="keyword">new</span> LinkedHashMap&lt;&gt;();</span><br><span class="line">   <span class="keyword">while</span> (!entries.isEmpty()) &#123;</span><br><span class="line">     <span class="comment">//从队列中取出第一个元素</span></span><br><span class="line">     Map.Entry&lt;TypeElement, BindingSet.Builder&gt; entry = entries.removeFirst();</span><br><span class="line"> </span><br><span class="line">     <span class="comment">//获取对应的key和value</span></span><br><span class="line">     TypeElement type = entry.getKey();</span><br><span class="line">     BindingSet.Builder builder = entry.getValue();</span><br><span class="line">     </span><br><span class="line">     <span class="comment">//查找当前元素的父类元素</span></span><br><span class="line">     TypeElement parentType = findParentType(type, erasedTargetNames);</span><br><span class="line">     <span class="keyword">if</span> (parentType == <span class="keyword">null</span>) &#123;</span><br><span class="line">       <span class="comment">//没找到父类，重新放入队列</span></span><br><span class="line">       bindingMap.put(type, builder.build());</span><br><span class="line">     &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="comment">//获取父类Element对应的BindingSet</span></span><br><span class="line">       BindingSet parentBinding = bindingMap.get(parentType);</span><br><span class="line">       <span class="keyword">if</span> (parentBinding != <span class="keyword">null</span>) &#123;</span><br><span class="line">         <span class="comment">//设置父类BindingSet并添加到Map中</span></span><br><span class="line">         builder.setParent(parentBinding);</span><br><span class="line">         bindingMap.put(type, builder.build());</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         <span class="comment">// Has a superclass binding but we haven&#x27;t built it yet. Re-enqueue for later.</span></span><br><span class="line">         <span class="comment">//具有超类绑定，但我们尚未构建它。重新排队以便稍后使用</span></span><br><span class="line">         entries.addLast(entry);</span><br><span class="line">       &#125;</span><br><span class="line">     &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">return</span> bindingMap;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>获取到所有的bind类注解的Element</li>
+<li>并执行parseBindView()方法，绑定buildingSet和TypeElement的对应关系：</li>
+<li>获取父类BindingSet对象，重新构建绑定关系，并返回该对应关系</li>
+</ol>
+<p>进入parseBindView中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseBindView</span><span class="params">(Element element, Map&lt;TypeElement, BindingSet.Builder&gt; builderMap,</span></span></span><br><span class="line"><span class="params"><span class="function">    Set&lt;TypeElement&gt; erasedTargetNames)</span> </span>&#123;</span><br><span class="line">  <span class="comment">//获取当前对象的父类，如果在Activity中使用，那么enclosingElement就是Activity类</span></span><br><span class="line">  TypeElement enclosingElement = (TypeElement) element.getEnclosingElement();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Start by verifying common generated code restrictions.</span></span><br><span class="line">  <span class="comment">//校验对象，不能使用private和static修饰</span></span><br><span class="line">  <span class="keyword">boolean</span> hasError = isInaccessibleViaGeneratedCode(BindView.class, <span class="string">&quot;fields&quot;</span>, element)</span><br><span class="line">      || isBindingInWrongPackage(BindView.class, element);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Verify that the target type extends from View.</span></span><br><span class="line">  TypeMirror elementType = element.asType();</span><br><span class="line">  <span class="keyword">if</span> (elementType.getKind() == TypeKind.TYPEVAR) &#123;</span><br><span class="line">    TypeVariable typeVariable = (TypeVariable) elementType;</span><br><span class="line">    elementType = typeVariable.getUpperBound();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">//获取类名（包名+类名）</span></span><br><span class="line">  Name qualifiedName = enclosingElement.getQualifiedName();</span><br><span class="line">  <span class="comment">//获取成员变量名称</span></span><br><span class="line">  Name simpleName = element.getSimpleName();</span><br><span class="line">  <span class="comment">//判断当前对象是否为view的子类或者接口，不是的话抛出异常</span></span><br><span class="line">  <span class="keyword">if</span> (!isSubtypeOfType(elementType, VIEW_TYPE) &amp;&amp; !isInterface(elementType)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (elementType.getKind() == TypeKind.ERROR) &#123;</span><br><span class="line">      note(element, <span class="string">&quot;@%s field with unresolved type (%s) &quot;</span></span><br><span class="line">              + <span class="string">&quot;must elsewhere be generated as a View or interface. (%s.%s)&quot;</span>,</span><br><span class="line">          BindView.class.getSimpleName(), elementType, qualifiedName, simpleName);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      error(element, <span class="string">&quot;@%s fields must extend from View or be an interface. (%s.%s)&quot;</span>,</span><br><span class="line">          BindView.class.getSimpleName(), qualifiedName, simpleName);</span><br><span class="line">      hasError = <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">if</span> (hasError) &#123;</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Assemble information on the field.</span></span><br><span class="line">  <span class="comment">//获取注解的value资源id（控件id值）</span></span><br><span class="line">  <span class="keyword">int</span> id = element.getAnnotation(BindView.class).value();</span><br><span class="line">  <span class="comment">//获取父类的BindingSet.Builder</span></span><br><span class="line">  BindingSet.Builder builder = builderMap.get(enclosingElement);</span><br><span class="line">  <span class="comment">//将id和对象进行绑定</span></span><br><span class="line">  QualifiedId qualifiedId = elementToQualifiedId(element, id);</span><br><span class="line">  <span class="keyword">if</span> (builder != <span class="keyword">null</span>) &#123;</span><br><span class="line">    <span class="comment">//查询是否重复绑定</span></span><br><span class="line">    String existingBindingName = builder.findExistingBindingName(getId(qualifiedId));</span><br><span class="line">    <span class="keyword">if</span> (existingBindingName != <span class="keyword">null</span>) &#123;</span><br><span class="line">      error(element, <span class="string">&quot;Attempt to use @%s for an already bound ID %d on &#x27;%s&#x27;. (%s.%s)&quot;</span>,</span><br><span class="line">          BindView.class.getSimpleName(), id, existingBindingName,</span><br><span class="line">          enclosingElement.getQualifiedName(), element.getSimpleName());</span><br><span class="line">      <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//将父类和BindingSet.Builder进行绑定并添加到builderMap中，并返回这个binder对象</span></span><br><span class="line">    builder = getOrCreateBindingBuilder(builderMap, enclosingElement);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  String name = simpleName.toString();</span><br><span class="line">  TypeName type = TypeName.get(elementType);</span><br><span class="line">  <span class="comment">//判断是否使用Nullable注解</span></span><br><span class="line">  <span class="keyword">boolean</span> required = isFieldRequired(element);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//将资源id，（对象名，对象类型，是否使用Nullable添加到builder中</span></span><br><span class="line">  builder.addField(getId(qualifiedId), <span class="keyword">new</span> FieldViewBinding(name, type, required));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Add the type-erased version to the valid binding targets set.</span></span><br><span class="line">  <span class="comment">//将父元素添加到集合中用来查找父元素信息</span></span><br><span class="line">  erasedTargetNames.add(enclosingElement);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>校验对象修饰不能是private和static</li>
+<li>校验View是否为对象的超类</li>
+<li>获取资源id并进行绑定，添加到集合中</li>
+</ol>
+<p>在上述分析过程中，生成一个BindingSet类再通过JavaFile生成对应文件<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">JavaFile <span class="title">brewJava</span><span class="params">(<span class="keyword">int</span> sdk, <span class="keyword">boolean</span> debuggable)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> JavaFile.builder(bindingClassName.packageName(), createType(sdk, debuggable))</span><br><span class="line">        <span class="comment">//添加类头注释</span></span><br><span class="line">        .addFileComment(<span class="string">&quot;Generated code from Butter Knife. Do not modify!&quot;</span>)</span><br><span class="line">        .build();</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></p>
+<p>将java版本和是否为debug传入，传入包名+类名，根据类型创建不同代码，JavaFile属于javapoet包类，使用javapoet将实现类代码生成文件。</p>
+<h5 id="getSupportedAnnotationTypes"><a href="#getSupportedAnnotationTypes" class="headerlink" title="getSupportedAnnotationTypes"></a>getSupportedAnnotationTypes</h5><p>获得要处理的注解</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> Set&lt;String&gt; <span class="title">getSupportedAnnotationTypes</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Set&lt;String&gt; types = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line">    <span class="keyword">for</span> (Class&lt;? extends Annotation&gt; annotation : getSupportedAnnotations()) &#123;</span><br><span class="line">      types.add(annotation.getCanonicalName());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> types;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">private</span> Set&lt;Class&lt;? extends Annotation&gt;&gt; getSupportedAnnotations() &#123;</span><br><span class="line">    Set&lt;Class&lt;? extends Annotation&gt;&gt; annotations = <span class="keyword">new</span> LinkedHashSet&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    annotations.add(BindAnim.class);</span><br><span class="line">    annotations.add(BindArray.class);</span><br><span class="line">    annotations.add(BindBitmap.class);</span><br><span class="line">    annotations.add(BindBool.class);</span><br><span class="line">    annotations.add(BindColor.class);</span><br><span class="line">    annotations.add(BindDimen.class);</span><br><span class="line">    annotations.add(BindDrawable.class);</span><br><span class="line">    annotations.add(BindFloat.class);</span><br><span class="line">    annotations.add(BindFont.class);</span><br><span class="line">    annotations.add(BindInt.class);</span><br><span class="line">    annotations.add(BindString.class);</span><br><span class="line">    annotations.add(BindView.class);</span><br><span class="line">    annotations.add(BindViews.class);</span><br><span class="line">    annotations.addAll(LISTENERS);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> annotations;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>ButterknifeProcessor支持的所有注解类型</p>
+<h5 id="getSupportedSourceVersion"><a href="#getSupportedSourceVersion" class="headerlink" title="getSupportedSourceVersion"></a>getSupportedSourceVersion</h5><p>指定java版本<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span> <span class="function"><span class="keyword">public</span> SourceVersion <span class="title">getSupportedSourceVersion</span><span class="params">()</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> SourceVersion.latestSupported();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><br>这个是基本写法，一般都这样写</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>Butterknife只是针对view的注入框架，在编译过程中，使用自定义注解器的方式解析注解，生成对应关系后，通过BindingSet+JavaFile的javapoet技术将程序类写入文件，生成Activity_ViewBinding文件，在bind方法中，反射获取Activity_ViewBinding类的构造函数，存入缓存，返回构造函数后实例化对象，完成视图的绑定</p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2021/05/31/%E9%9A%8F%E7%AC%94/%E8%8C%B6%E9%81%93/" class="pre-post btn btn-default" title='茶道'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            茶道</span>
+    </a>
+    
+    
+    <a href="/2020/04/16/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/EventBus%E7%94%A8%E6%B3%95%E5%92%8C%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90/" class="next-post btn btn-default" title='EventBus用法和源码解析'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            EventBus用法和源码解析</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-text">使用</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="toc-text">源码解析</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ViewBinding%E7%B1%BB%E6%98%AF%E6%80%8E%E4%B9%88%E7%94%9F%E6%88%90%E7%9A%84%EF%BC%9F"><span class="toc-text">_ViewBinding类是怎么生成的？</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#init"><span class="toc-text">init</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#process"><span class="toc-text">process</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#getSupportedAnnotationTypes"><span class="toc-text">getSupportedAnnotationTypes</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#getSupportedSourceVersion"><span class="toc-text">getSupportedSourceVersion</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-text">总结</span></a></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>

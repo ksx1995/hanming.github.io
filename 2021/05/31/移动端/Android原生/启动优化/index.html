@@ -1,0 +1,412 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+
+<head>
+    <!--Setting-->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+    <meta http-equiv="Cache-Control" content="no-siteapp">
+    <meta http-equiv="Cache-Control" content="no-transform">
+    <meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta name="apple-mobile-web-app-capable" content="纳兰寒明的博客">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no,email=no,adress=no">
+    <meta name="browsermode" content="application">
+    <meta name="screen-orientation" content="portrait">
+    <meta name="theme-version" content="1.2.3">
+    <meta name="root" content="/">
+    <link rel="dns-prefetch" href="http://yoursite.com">
+    <!--SEO-->
+
+<meta name="keywords" content="Android" />
+
+
+<meta name="description" content="app启动过程
+点击图标启动
+LauncherApp通知AMS进行启动，LauncherActivity onPause
+AMS新建app进程，创建ActivityThread，创建Applic..." />
+
+
+<meta name="robots" content="all" />
+<meta name="google" content="all" />
+<meta name="googlebot" content="all" />
+<meta name="verify" content="all" />
+    <!--Title-->
+
+<title>
+    
+    启动优化 |
+    
+    纳兰寒明的博客
+</title>
+
+<link rel="alternate" href="/atom.xml" title="纳兰寒明的博客" type="application/atom+xml">
+
+
+<link rel="icon" href="/avatar.ico">
+
+    
+
+
+<link rel="stylesheet" href="/css/bootstrap.min.css?rev=3.3.7.css">
+<link rel="stylesheet" href="/css/font-awesome.min.css?rev=4.7.0.css">
+<link rel="stylesheet" href="/css/style.css?rev=@@hash.css">
+
+    
+<div class="hide">
+    <script type="text/javascript">
+    var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+    document.write(unescape("%3Cspan class='cnzz_stat_icon_1263868967 hide' %3E%3Cscript%20src%3D%22https%3A%2F%2Fs95.cnzz.com%2Fz_stat.php%3Fweb_id%3D1272564536%22%3E%3C%2Fscript%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s19.cnzz.com/z_stat.php%3Fid%3D1263868967%26show%3Dpic1' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+</div>
+
+
+
+
+    
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+<!--[if lte IE 8]>
+<style>
+    html{ font-size: 1em }
+</style>
+<![endif]-->
+<!--[if lte IE 9]>
+<div style="ie">你使用的浏览器版本过低，为了你更好的阅读体验，请更新浏览器的版本或者使用其他现代浏览器，比如Chrome、Firefox、Safari等。</div>
+<![endif]-->
+<body>
+    <header class="main-header"  style="background-image:url(
+    https://hexo-theme-snippet-1251680922.cos.ap-beijing.myqcloud.com/img/banner.jpg)"
+     >
+    <div class="main-header-box">
+        <a class="header-avatar" href="/" title='纳兰寒明'>
+            <img src="/img/avatar.jpg" alt="logo头像" class="img-responsive center-block">
+        </a>
+        <div class="branding">
+            <!--<h2 class="text-hide">Snippet主题,从未如此简单有趣</h2>-->
+            
+            <h2>
+                我有一个梦想
+            </h2>
+            
+        </div>
+    </div>
+</header>
+    <nav class="main-navigation">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="navbar-header"><span class="nav-toggle-button collapsed pull-right" data-toggle="collapse" data-target="#main-menu" id="mnav">
+                        <span class="sr-only"></span>
+                        <i class="fa fa-bars"></i>
+                    </span>
+                    <a class="navbar-brand" href="http://yoursite.com">
+                        纳兰寒明的博客</a>
+                </div>
+                <div class="collapse navbar-collapse" id="main-menu">
+                    <ul class="menu">
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/"><i class="fa "></i>
+                                首页</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/前端/"><i class="fa "></i>
+                                前端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/后端/"><i class="fa "></i>
+                                后端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/categories/移动端/"><i class="fa "></i>
+                                移动端</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/随笔/"><i class="fa "></i>
+                                随笔</a>
+                        </li>
+                        
+                        <li role="presentation" class="text-center">
+                            <a href="/archives/"><i class="fa "></i>
+                                时光轴</a>
+                        </li>
+                        
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>
+    <section class="content-wrap">
+        <div class="container">
+            <div class="row">
+                <main class="col-md-8 main-content m-post">
+                    <p id="process"></p>
+<article class="post">
+    <div class="post-head">
+        <h1 id="启动优化">
+            
+            启动优化
+            
+        </h1>
+        <div class="post-meta">
+    
+    <span class="categories-meta fa-wrap">
+        <i class="fa fa-folder-open-o"></i>
+        <a class="category-link" href="/categories/%E7%A7%BB%E5%8A%A8%E7%AB%AF/">移动端</a>
+    </span>
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-tags"></i>
+        <span class="tags-meta">
+            
+            <a class="tag-none-link" href="/tags/Android/" rel="tag">Android</a>
+            
+        </span>
+    </span>
+    
+    
+    
+    <span class="fa-wrap">
+        <i class="fa fa-clock-o"></i>
+        <span class="date-meta">
+            2021/05/31</span>
+    </span>
+    
+    
+</div>
+        
+        
+    </div>
+    
+    <div class="post-body post-content">
+        <h4 id="app启动过程"><a href="#app启动过程" class="headerlink" title="app启动过程"></a>app启动过程</h4><ol>
+<li>点击图标启动</li>
+<li>LauncherApp通知AMS进行启动，LauncherActivity onPause</li>
+<li>AMS新建app进程，创建ActivityThread，创建ApplicationThread</li>
+<li>通过ApplicationThread向AMS注册Binder</li>
+<li>执行Application的onCreate方法</li>
+<li>新建进入的Activity</li>
+<li>执行Activity的onCreate方法，进行UI绘制等操作</li>
+</ol>
+<h4 id="启动分类"><a href="#启动分类" class="headerlink" title="启动分类"></a>启动分类</h4><ul>
+<li>冷启动：从点击应用图标到UI界面完全显示且用户可操作的全部过程。</li>
+</ul>
+<p>Click Event    -&gt;     IPC     -&gt;     Process.start     -&gt;      ActivityThread -&gt;    bindApplication      -&gt;      LifeCycle    -&gt;     ViewRootImpl</p>
+<ul>
+<li>热启动：直接从后台切换到前台。</li>
+</ul>
+<h4 id="优化方向"><a href="#优化方向" class="headerlink" title="优化方向"></a>优化方向</h4><p>可优化Application、Activity的创建以及回调过程</p>
+<ol>
+<li>提前展示一个window（欢迎页），给用户友好的提示</li>
+<li>避免启动做繁重密集的初始化操作</li>
+<li>过度绘制，网络，io等优化</li>
+</ol>
+<h4 id="优化检测"><a href="#优化检测" class="headerlink" title="优化检测"></a>优化检测</h4><ol>
+<li>adb命令检测<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 其中的AppstartActivity全路径可以省略前面的packageName</span></span><br><span class="line">adb shell am start -W [packageName]/[AppstartActivity全路径]</span><br></pre></td></tr></table></figure></li>
+</ol>
+<ul>
+<li>ThisTime：最后一个Activity的启动耗时</li>
+<li>TotalTime：所有Activity的启动耗时</li>
+<li>WaitTime：表示AMS启动Activity的总耗时。</li>
+</ul>
+<p>一般读取WaitTime，为Application和Activity的初始化过程耗时。（冷启动耗时）</p>
+<p>优缺点：</p>
+<ul>
+<li>线下使用方便，不能带到线上</li>
+<li>非精确时间</li>
+</ul>
+<ol start="2">
+<li>自定义打点查看耗时</li>
+</ol>
+<ul>
+<li>应用生命周期节点</li>
+<li>启动的初始化方法节点</li>
+<li>其他耗时业务，算法节点</li>
+</ul>
+<p>优缺点：</p>
+<ul>
+<li>精确，可上线</li>
+<li>修改成本高</li>
+</ul>
+<p>3.AOP打点<br>加入aspectjx库，打印出Application，Activity的耗时时间，进行针对优化</p>
+<p>根路径build.gradle中添加<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">classpath <span class="string">&#x27;com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.0&#x27;</span></span><br></pre></td></tr></table></figure><br>app中build.gradle中添加<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">apply plugin: <span class="string">&#x27;android-aspectjx&#x27;</span></span><br><span class="line">...</span><br><span class="line">implementation <span class="string">&#x27;org.aspectj:aspectjrt:1.8.+&#x27;</span></span><br></pre></td></tr></table></figure><br>使用如下：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Aspect</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LauncherAop</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Around(&quot;call(* com.jw.myapplication.MainActivity.**(..))&quot;)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">getTime</span><span class="params">(ProceedingJoinPoint joinPoint)</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">        Signature signature = joinPoint.getSignature();</span><br><span class="line">        String name = signature.toShortString();</span><br><span class="line">        <span class="keyword">long</span> time = System.currentTimeMillis();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            joinPoint.proceed();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Throwable throwable) &#123;</span><br><span class="line">            throwable.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        Log.d(<span class="string">&quot;kangkang = &quot;</span>,<span class="string">&quot;kangaop = &quot;</span> +name+ <span class="string">&quot; cost &quot;</span> + (System.currentTimeMillis() - time));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.TraceView</p>
+<p>代码中开启<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Debug.startMethodTracing();</span><br><span class="line">method();</span><br><span class="line">Debug.stopMethodTracing();</span><br></pre></td></tr></table></figure></p>
+<p>生成.trace文件，导入Android Studio，使用profile中的cpu查看文件生成的火炬图</p>
+<h4 id="优化方案"><a href="#优化方案" class="headerlink" title="优化方案"></a>优化方案</h4><ol>
+<li>主题切换</li>
+</ol>
+<p>设置自定义主题设置背景图，执行到onCreate方法后替换为Activiy的真实布局</p>
+<ol start="2">
+<li>初始化分化<br><img src="/imageMd/appStartUp-1.png" alt="img"></li>
+</ol>
+<ul>
+<li>MultiDex以及Tinker的初始化操作</li>
+<li>Application中的第三方组件的初始化<ol>
+<li>异步初始化组件，不阻塞主线程，设置异步线程为THREAD_PRIORITY_BACKGROUND</li>
+<li>延迟初始化操作，再线程空闲时加载，</li>
+<li>EventBus、ota、bugly、migu、Linphone、Butterknife、地图、IOT</li>
+</ol>
+</li>
+<li>设置线程池初始化任务<ol>
+<li>仿照AsyncTask新建线程池，核心线程数为2-4个</li>
+<li>任务使用该线程池加载，如有顺序，使用CountDownLatch进行处理</li>
+</ol>
+</li>
+<li>部分任务可以延迟加载，使用IdleHandler，在主线程空闲时加载</li>
+<li>Multidex预加载优化</li>
+</ul>
+<h4 id="优化方案-1"><a href="#优化方案-1" class="headerlink" title="优化方案"></a>优化方案</h4><p>在使用Aspect进行时间的监测时，发现Application和Activity中的初始化三方进程耗费了大量时间，在初始化时，我们开启了百度OTA服务，Bugly监测服务，咪咕音乐服务，阿里IOT服务，日志监测服务，Linphone语音服务，Ifly语音服务等，这些串行起来是比较耗时的。<br>所以我们采用开启一个线程池的方案，在子线程启动这些服务，对于OTA，IOT，日志检测，Linphone等服务不需要在第一时间初始化，所以放到线程池中根据执行顺序分别初始化。但是对于咪咕、Ifly和bugly来说，需要第一时间初始化，才能进行后边的逻辑，所以我们将这些服务优先初始化，并联合CountDownLatch，当必须的服务初始化完成后，才进入下面的流程。<br>对于必须要在主线程进行初始化的操作，可能会造成主线程繁忙卡顿，所以使用IdleHandler方法，在主线程空闲时执行，</p>
+<p>具体优化了40%，由2.3s压缩到1.4s。</p>
+<p>如果由任务A，B，C，D，要求C在A之后执行，D在B之后执行，那么直接将A,C合并为一个任务，放入线程池中运行，B、D合并为一个任务，放入线池程中执行，如需决定AC和BD的顺序，那么可以按照AC、BD的顺序依次放入子线程中。</p>
+<h4 id="如何对IDLEHandler进行顺序划分？比如先执行B，在执行A"><a href="#如何对IDLEHandler进行顺序划分？比如先执行B，在执行A" class="headerlink" title="如何对IDLEHandler进行顺序划分？比如先执行B，在执行A"></a>如何对IDLEHandler进行顺序划分？比如先执行B，在执行A</h4><p>规划一个空闲队列，在Handler空闲时进行处理，每次出队优先级最高的，其他等到下次空闲在执行</p>
+<h4 id="2-4是怎么计算的？"><a href="#2-4是怎么计算的？" class="headerlink" title="2-4是怎么计算的？"></a>2-4是怎么计算的？</h4><p>核心线程数位2-4，计算方式是cpu核数-1，如果比2小，就选择2，比4大就选择4，中间就选它自己，<br>之所以 减掉这个1，是因为为了避免后台任务将 CPU 资源完全耗尽， 减掉的这个1 是留给我们 主线程 使用的。</p>
+
+    </div>
+    
+    <div class="post-footer">
+        <div>
+            
+            转载声明：
+            商业转载请联系作者获得授权,非商业转载请注明出处 © <a href="" target="_blank">Snippet</a>
+            
+            
+        </div>
+        <div>
+            
+        </div>
+    </div>
+</article>
+<div class="article-nav prev-next-wrap clearfix">
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" class="pre-post btn btn-default" title='设计模式'>
+        <i class="fa fa-angle-left fa-fw"></i><span class="hidden-lg">上一篇</span>
+        <span class="hidden-xs">
+            设计模式</span>
+    </a>
+    
+    
+    <a href="/2021/05/31/%E7%A7%BB%E5%8A%A8%E7%AB%AF/Android%E5%8E%9F%E7%94%9F/%E6%B3%A8%E8%A7%A3%E5%8E%9F%E7%90%86/" class="next-post btn btn-default" title='注解原理'>
+        <span class="hidden-lg">下一篇</span>
+        <span class="hidden-xs">
+            注解原理</span><i class="fa fa-angle-right fa-fw"></i>
+    </a>
+    
+</div>
+
+<div id="comments">
+    
+
+<div id="vcomments" class="valine"></div>
+
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="/assets/valine.min.js"></script>
+
+<script>
+new Valine({
+    av: AV,
+    el: '#vcomments',
+    appId: 'xOKV9J4UeQAtVkvnJC7Kq2Jn-gzGzoHsz',
+    appKey: 'erIpQac4azoCmgfBB7Dl9maa',
+    placeholder: '说点什么吧',
+    notify: false,
+    verify: true,
+    avatar: 'mm',
+    meta: 'nick,mail'.split(','),
+    pageSize: '10',
+    path: window.location.pathname,
+    lang: 'zh-CN'.toLowerCase()
+})
+</script>
+
+
+</div>
+
+                </main>
+                
+                    <aside id="article-toc" role="navigation" class="col-md-4">
+    <div class="widget">
+        <h3 class="title">
+            文章目录
+        </h3>
+        
+        <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#app%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="toc-text">app启动过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%AF%E5%8A%A8%E5%88%86%E7%B1%BB"><span class="toc-text">启动分类</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E5%90%91"><span class="toc-text">优化方向</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%A3%80%E6%B5%8B"><span class="toc-text">优化检测</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88"><span class="toc-text">优化方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%98%E5%8C%96%E6%96%B9%E6%A1%88-1"><span class="toc-text">优化方案</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A6%82%E4%BD%95%E5%AF%B9IDLEHandler%E8%BF%9B%E8%A1%8C%E9%A1%BA%E5%BA%8F%E5%88%92%E5%88%86%EF%BC%9F%E6%AF%94%E5%A6%82%E5%85%88%E6%89%A7%E8%A1%8CB%EF%BC%8C%E5%9C%A8%E6%89%A7%E8%A1%8CA"><span class="toc-text">如何对IDLEHandler进行顺序划分？比如先执行B，在执行A</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-4%E6%98%AF%E6%80%8E%E4%B9%88%E8%AE%A1%E7%AE%97%E7%9A%84%EF%BC%9F"><span class="toc-text">2-4是怎么计算的？</span></a></li></ol>
+        
+    </div>
+</aside>
+                
+            </div>
+        </div>
+    </section>
+    <footer class="main-footer">
+    <div class="container">
+        <div class="row">
+        </div>
+    </div>
+</footer>
+<a id="back-to-top" class="icon-btn hide">
+    <i class="fa fa-chevron-up"></i>
+</a>
+    <div class="copyright">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="busuanzi">
+    
+</div>
+            </div>
+            <div class="col-sm-12">
+                <span>Copyright &copy;
+                    2017
+                    
+                </span> |
+                <span>
+                    Powered by <a href="//hexo.io" class="copyright-links" target="_blank" rel="nofollow">Hexo</a>
+                </span> |
+                <span>
+                    Theme by <a href="//github.com/shenliyang/hexo-theme-snippet.git" class="copyright-links" target="_blank" rel="nofollow">Snippet</a>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="/assets/tagcanvas.min.js?rev=2.9.js"></script>
+
+<script>
+var tagOption = {
+    textColour: '#444', // 字体颜色
+    outlineMethod: 'block', // 选中模式
+    outlineColour: '#FFDAB9', // 选中模式的颜色
+    interval: 30 || 30, // 动画帧之间的时间间隔，值越大，转动幅度越大
+    textHeight: 13,
+    outlineRadius: 3,
+    freezeActive: true || '', // 选中的标签是否继续滚动
+    frontSelect: true || '', // 不选标签云后部的标签
+    initial: [0.1, -0.1],
+    depth: 0.5,
+    decel: 0.95,
+    maxSpeed: 0.03,
+    reverse: true || '', // 是否反向触发
+    fadeIn: 500, // 进入动画时间
+    wheelZoom: false || '' // 是否启用鼠标滚轮
+}
+TagCanvas.Start('tag-cloud-3d', '', tagOption);
+</script>
+
+
+
+<script src="/js/app.js?rev=@@hash.js"></script>
+
+</body>
+</html>
